@@ -1,6 +1,8 @@
-# adn_project1
+# Project 1: Popular Movies, Stage 1
 
-To setup the "TheMovieDB" API Key create a 'private_keys.xml' file under 'app/src/main/res/values/' with the following content
+## Setting up the project
+
+To setup the "TheMovieDB" API Key create a 'private_keys.xml' file under 'app/src/main/res/values/' with the following content:
 
 ```
 <resources>
