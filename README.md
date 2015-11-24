@@ -2,7 +2,7 @@
 
 ## Setting up the project
 
-To setup the "TheMovieDB" API Key create a 'private_keys.xml' file under 'app/src/main/res/values/' with the following content:
+To setup the "TheMovieDB" API Key create a *private_keys.xml* file under **app/src/main/res/values** with the following content:
 
 ```
 <resources>
