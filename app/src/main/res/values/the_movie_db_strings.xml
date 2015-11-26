@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tmdb_discover_api_url">http://api.themoviedb.org/3/discover/movie</string>
+</resources>
