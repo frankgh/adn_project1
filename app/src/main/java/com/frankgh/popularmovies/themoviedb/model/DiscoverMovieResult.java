@@ -1,5 +1,9 @@
 package com.frankgh.popularmovies.themoviedb.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.frankgh.popularmovies.util.AndroidUtil;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -8,11 +12,24 @@ import java.util.List;
 /**
  * Created by francisco on 11/25/15.
  */
-public class DiscoverMovieResult {
+public class DiscoverMovieResult implements Parcelable {
 
-    private Boolean adult;
+    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<DiscoverMovieResult> CREATOR = new Parcelable.Creator<DiscoverMovieResult>() {
+        public DiscoverMovieResult createFromParcel(Parcel in) {
+            return new DiscoverMovieResult(in);
+        }
+
+        public DiscoverMovieResult[] newArray(int size) {
+            return new DiscoverMovieResult[size];
+        }
+    };
+
+    private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
+
     @SerializedName("backdrop_path")
     private String backdropPath;
+    private Boolean adult;
     @SerializedName("genre_ids")
     private List<Integer> genreIds = new ArrayList<Integer>();
     private Integer id;
@@ -32,6 +49,23 @@ public class DiscoverMovieResult {
     private Double voteAverage;
     @SerializedName("vote_count")
     private Integer voteCount;
+
+    private DiscoverMovieResult(Parcel in) {
+        backdropPath = AndroidUtil.readStringFromParcel(in);
+        adult = AndroidUtil.readBooleanFromParcel(in);
+        genreIds = AndroidUtil.readIntegerListFromParcel(in);
+        id = AndroidUtil.readIntegerFromParcel(in);
+        originalLanguage = AndroidUtil.readStringFromParcel(in);
+        originalTitle = AndroidUtil.readStringFromParcel(in);
+        overview = AndroidUtil.readStringFromParcel(in);
+        releaseDate = AndroidUtil.readStringFromParcel(in);
+        posterPath = AndroidUtil.readStringFromParcel(in);
+        popularity = AndroidUtil.readDoubleFromParcel(in);
+        title = AndroidUtil.readStringFromParcel(in);
+        video = AndroidUtil.readBooleanFromParcel(in);
+        voteAverage = AndroidUtil.readDoubleFromParcel(in);
+        voteCount = AndroidUtil.readIntegerFromParcel(in);
+    }
 
     public Boolean getAdult() {
         return adult;
@@ -87,5 +121,27 @@ public class DiscoverMovieResult {
 
     public Integer getVoteCount() {
         return voteCount;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        AndroidUtil.writeToParcel(backdropPath, out);
+        AndroidUtil.writeToParcel(adult, out);
+        AndroidUtil.writeToParcel(genreIds, out);
+        AndroidUtil.writeToParcel(id, out);
+        AndroidUtil.writeToParcel(originalLanguage, out);
+        AndroidUtil.writeToParcel(originalTitle, out);
+        AndroidUtil.writeToParcel(overview, out);
+        AndroidUtil.writeToParcel(releaseDate, out);
+        AndroidUtil.writeToParcel(posterPath, out);
+        AndroidUtil.writeToParcel(popularity, out);
+        AndroidUtil.writeToParcel(title, out);
+        AndroidUtil.writeToParcel(video, out);
+        AndroidUtil.writeToParcel(voteAverage, out);
+        AndroidUtil.writeToParcel(voteCount, out);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 public class TheMovieDbService {
 
     public final static String SORT_BY_POPULARITY = "popularity";
-    public final static String SORT_BY_RANKING = "ranking";
+    public final static String SORT_BY_RATING = "vote_average";
     public final static String SORT_ORDER_ASC = "asc";
     public final static String SORT_ORDER_DESC = "desc";
     private final String LOG_TAG = TheMovieDbService.class.getSimpleName();
