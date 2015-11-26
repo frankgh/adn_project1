@@ -1,4 +1,4 @@
-package com.frankgh.popularmovies;
+package com.frankgh.popularmovies.app;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,7 +13,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.frankgh.popularmovies.themoviedb.api.TheMovieDbApi;
+import com.frankgh.popularmovies.MovieAdapter;
+import com.frankgh.popularmovies.R;
+import com.frankgh.popularmovies.themoviedb.api.TheMovieDbService;
 import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
 
 import java.util.List;
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        GridView gridview = (GridView) findViewById(R.id.moviesGridview);
+        GridView gridview = (GridView) findViewById(R.id.moviesGridView);
         gridview.setAdapter(new MovieAdapter(this, R.layout.movie_grid_item, null));
 
 
@@ -82,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
             List<DiscoverMovieResult> results = null;
 
             try {
-                results = new TheMovieDbApi(getApplicationContext())
-                        .discoverMovies(TheMovieDbApi.SORT_BY_POPULARITY, TheMovieDbApi.SORT_ORDER_DESC);
+                results = new TheMovieDbService(getApplicationContext())
+                        .discoverMovies(TheMovieDbService.SORT_BY_POPULARITY, TheMovieDbService.SORT_ORDER_DESC);
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
             }

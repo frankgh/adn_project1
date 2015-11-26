@@ -21,16 +21,16 @@ import java.util.List;
 /**
  * Created by francisco on 11/24/15.
  */
-public class TheMovieDbApi {
+public class TheMovieDbService {
 
     public final static String SORT_BY_POPULARITY = "popularity";
     public final static String SORT_BY_RANKING = "ranking";
     public final static String SORT_ORDER_ASC = "asc";
     public final static String SORT_ORDER_DESC = "desc";
-    private final String LOG_TAG = TheMovieDbApi.class.getSimpleName();
+    private final String LOG_TAG = TheMovieDbService.class.getSimpleName();
     private Context mContext;
 
-    public TheMovieDbApi(Context context) {
+    public TheMovieDbService(Context context) {
         mContext = context;
     }
 
