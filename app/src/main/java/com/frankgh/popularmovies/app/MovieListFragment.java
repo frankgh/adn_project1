@@ -1,5 +1,6 @@
 package com.frankgh.popularmovies.app;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.frankgh.popularmovies.R;
@@ -65,15 +67,19 @@ public class MovieListFragment extends Fragment {
         // the adapter for the movies
         mMovieAdapter = new MovieAdapter(
                 getActivity(), // context
-                R.layout.movie_grid_item, // the layout id for the movie view
+                R.layout.grid_item_movie, // the layout id for the movie view
                 mMovieList // the movie data
         );
 
-        // Attach the adapter to the gridview
-        mGridView.setAdapter(mMovieAdapter);
-        mGridView.setOnClickListener(new View.OnClickListener() {
+        mGridView.setAdapter(mMovieAdapter); // Attach the adapter to the gridview
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DiscoverMovieResult movieData = mMovieList.get(position);
+                Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
+                detailIntent.putExtra(MovieDetailActivity.MOVIE_DETAIL_KEY, movieData);
+                //detailIntent.putExtra(Constants.POSTER_IMAGE_KEY, posterBitmap);
+                startActivity(detailIntent);
             }
         });
 
@@ -95,8 +101,8 @@ public class MovieListFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         ButterKnife.unbind(this);
     }
 
