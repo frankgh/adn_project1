@@ -35,7 +35,7 @@ public class MovieDetailActivityFragment extends Fragment {
             return rootView;
         }
 
-        //getActivity().setTitle(mMovieData.getTitle());
+        getActivity().setTitle(mMovieData.getTitle());
 
 
         return rootView;

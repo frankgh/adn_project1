@@ -84,7 +84,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 DiscoverMovieResult movieData = mMovieList.get(position);
                 Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
                 detailIntent.putExtra(MovieDetailActivity.MOVIE_DETAIL_KEY, movieData);
-                //detailIntent.putExtra(Constants.POSTER_IMAGE_KEY, posterBitmap);
                 startActivity(detailIntent);
             }
         });
