@@ -8,6 +8,8 @@
     <string name="action_most_voted">Best Voted</string>
     <string name="action_least_voted">Lowest Voted</string>
 
+    <string name="grid_item_movie_poster_image">Poster Image</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_movie_detail">MovieDetailActivity</string>

@@ -123,6 +123,27 @@ public class DiscoverMovieResult implements Parcelable {
         return voteCount;
     }
 
+    /**
+     * Returns the Absolute Path to the poster image with a default size
+     *
+     * @return the absolute path
+     */
+    public String getPosterAbsolutePath() {
+        return getPosterAbsolutePath("w185");
+    }
+
+    /**
+     * Returns the Absolute Path to the poster image. Possible sizes are:
+     * w92, w154, w185, w342", "w500", "w780", or "original"
+     *
+     * @param imageSize one of the possible sizes: w92, w154, w185, w342, w500, w780, or original
+     * @return the absolute path for the given imageSize
+     */
+    public String getPosterAbsolutePath(String imageSize) {
+        return "http://image.tmdb.org/t/p/" + imageSize + getPosterPath();
+    }
+
+
     public void writeToParcel(Parcel out, int flags) {
         AndroidUtil.writeToParcel(backdropPath, out);
         AndroidUtil.writeToParcel(adult, out);
