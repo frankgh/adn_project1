@@ -39,7 +39,6 @@ public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
         }
 
-
         ImageView posterImageView = (ImageView) convertView.findViewById(R.id.posterImageView);
         TextView textView = (TextView) convertView.findViewById(R.id.movieTitle);
 

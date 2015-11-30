@@ -26,6 +26,7 @@ public class DiscoverMovieResult implements Parcelable {
     };
 
     private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
+    private final String DEFAULT_IMAGE_SIZE = "w342";
 
     @SerializedName("backdrop_path")
     private String backdropPath;
@@ -129,7 +130,7 @@ public class DiscoverMovieResult implements Parcelable {
      * @return the absolute path
      */
     public String getPosterAbsolutePath() {
-        return getPosterAbsolutePath("w185");
+        return getPosterAbsolutePath(DEFAULT_IMAGE_SIZE);
     }
 
     /**
@@ -143,6 +144,25 @@ public class DiscoverMovieResult implements Parcelable {
         return "http://image.tmdb.org/t/p/" + imageSize + getPosterPath();
     }
 
+    /**
+     * Returns the Absolut Path the the backdrop image with a default size
+     *
+     * @return the absolute path
+     */
+    public String getBackDropAbsolutePath() {
+        return getBackDropAbsolutePath(DEFAULT_IMAGE_SIZE);
+    }
+
+    /**
+     * Returns the Absolute Path to the backdrop image. Possible sizes are:
+     * w92, w154, w185, w342", "w500", "w780", or "original"
+     *
+     * @param imageSize one of the possible sizes: w92, w154, w185, w342, w500, w780, or original
+     * @return the absolute path for the given imageSize
+     */
+    public String getBackDropAbsolutePath(String imageSize) {
+        return "http://image.tmdb.org/t/p/" + imageSize + getBackdropPath();
+    }
 
     public void writeToParcel(Parcel out, int flags) {
         AndroidUtil.writeToParcel(backdropPath, out);
