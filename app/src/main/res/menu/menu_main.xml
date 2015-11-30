@@ -17,9 +17,4 @@
         android:orderInCategory="115"
         android:title="@string/action_recent_releases"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_least_popular"
-        android:orderInCategory="400"
-        android:title="@string/action_least_popular"
-        app:showAsAction="never" />
 </menu>

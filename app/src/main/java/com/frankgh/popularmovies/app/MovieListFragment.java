@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import butterknife.ButterKnife;
  *
  * @author francisco <email>frank.guerrero@gmail.com</email>
  */
-public class MovieListFragment extends Fragment {
+public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private final String LOG_TAG = MovieListFragment.class.getSimpleName();
     private final String MOVIE_LIST_KEY = "MovieListFragment_Movie_Data";
@@ -39,7 +40,7 @@ public class MovieListFragment extends Fragment {
     @Bind(R.id.gridview_movies)
     GridView mGridView;
 
-    private MovieAdapter mMovieAdapter;
+    private MovieGridAdapter mMovieGridAdapter;
     private List<DiscoverMovieResult> mMovieList;
 
     private boolean mLoadData;
@@ -70,13 +71,13 @@ public class MovieListFragment extends Fragment {
         ButterKnife.bind(this, rootView);
 
         // the adapter for the movies
-        mMovieAdapter = new MovieAdapter(
+        mMovieGridAdapter = new MovieGridAdapter(
                 getActivity(), // context
                 R.layout.grid_item_movie, // the layout id for the movie view
                 mMovieList // the movie data
         );
 
-        mGridView.setAdapter(mMovieAdapter); // Attach the adapter to the gridview
+        mGridView.setAdapter(mMovieGridAdapter); // Attach the adapter to the gridview
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -89,6 +90,12 @@ public class MovieListFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onRefresh() {
+        Log.d(LOG_TAG, "Reloading movies");
+        updateMovies();
     }
 
     @Override
@@ -109,9 +116,7 @@ public class MovieListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         String sortBy = null, sortOrder = null;
 
-
         switch (item.getItemId()) {
-
             case R.id.action_most_popular:
                 sortBy = TheMovieDbService.SORT_BY_POPULARITY;
                 sortOrder = TheMovieDbService.SORT_ORDER_DESC;
@@ -125,11 +130,6 @@ public class MovieListFragment extends Fragment {
             case R.id.action_recent_releases:
                 sortBy = TheMovieDbService.SORT_BY_RELEASE_DATE;
                 sortOrder = TheMovieDbService.SORT_ORDER_DESC;
-                break;
-
-            case R.id.action_least_popular:
-                sortBy = TheMovieDbService.SORT_BY_POPULARITY;
-                sortOrder = TheMovieDbService.SORT_ORDER_ASC;
                 break;
         }
 
@@ -192,7 +192,7 @@ public class MovieListFragment extends Fragment {
         protected void onPostExecute(List<DiscoverMovieResult> results) {
             mMovieList = results;
             if (mMovieList != null) {
-                mMovieAdapter.swapData(mMovieList);
+                mMovieGridAdapter.swapData(mMovieList);
             }
         }
     }

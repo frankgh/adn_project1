@@ -30,6 +30,14 @@ public class MovieDetailActivityFragment extends Fragment {
             mMovieData = intent.getParcelableExtra(MovieDetailActivity.MOVIE_DETAIL_KEY);
         }
 
+        if (mMovieData == null) {
+            getActivity().onBackPressed();
+            return rootView;
+        }
+
+        //getActivity().setTitle(mMovieData.getTitle());
+
+
         return rootView;
     }
 }

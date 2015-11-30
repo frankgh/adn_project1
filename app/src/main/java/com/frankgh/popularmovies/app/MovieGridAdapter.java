@@ -40,9 +40,12 @@ public class MovieGridAdapter extends ArrayAdapter<DiscoverMovieResult> {
      * @param movieData movie data
      */
     private void bindMovieDataToView(View itemView, final DiscoverMovieResult movieData) {
+        final TextView movieTitleText = (TextView) itemView.findViewById(R.id.grid_item_movie_title);
+        movieTitleText.setText(movieData.getTitle());
+
         final TextView voteAvgText = (TextView) itemView.findViewById(R.id.grid_item_movie_vote_average);
         NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
-        voteAvgText.setText(voteAvgFormatter.format(movieData.getVoteAverage(5.0)));
+        voteAvgText.setText(voteAvgFormatter.format(movieData.getVoteAverage()));
 
         final ImageView posterImageView = (ImageView) itemView.findViewById(R.id.posterImageView);
         posterImageView.setContentDescription(movieData.getTitle());
@@ -51,7 +54,6 @@ public class MovieGridAdapter extends ArrayAdapter<DiscoverMovieResult> {
         if (movieData.getPosterAbsolutePath() != null) {
             Picasso.with(getContext())
                     .load(movieData.getPosterAbsolutePath())
-                    .placeholder(R.drawable.ic_movie_placeholder)
                     .networkPolicy(NetworkPolicy.OFFLINE)
                     .into(posterImageView, new Callback() {
                         @Override

@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="grid_item_movie_height">275dp</dimen>
+    <dimen name="grid_item_movie_pill_height">36dp</dimen>
+    <dimen name="grid_item_movie_pill_item_margin">5dp</dimen>
 </resources>

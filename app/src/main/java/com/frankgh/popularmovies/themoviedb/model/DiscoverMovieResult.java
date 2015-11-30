@@ -171,10 +171,6 @@ public class DiscoverMovieResult implements Parcelable {
         return "http://image.tmdb.org/t/p/" + imageSize + getBackdropPath();
     }
 
-    public double getVoteAverage(Double maxVote) {
-        return getVoteAverage().doubleValue() * 10.0 / maxVote;
-    }
-
     public void writeToParcel(Parcel out, int flags) {
         AndroidUtil.writeToParcel(backdropPath, out);
         AndroidUtil.writeToParcel(adult, out);
