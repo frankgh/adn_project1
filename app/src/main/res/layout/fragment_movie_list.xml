@@ -14,8 +14,8 @@
             android:id="@+id/gridview_movies"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="?attr/actionBarSize"
-            android:numColumns="auto_fit" />
+            android:numColumns="auto_fit"
+            android:paddingTop="?attr/actionBarSize" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

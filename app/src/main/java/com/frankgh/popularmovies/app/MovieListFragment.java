@@ -1,11 +1,15 @@
 package com.frankgh.popularmovies.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,6 +34,7 @@ public class MovieListFragment extends Fragment {
 
     private final String LOG_TAG = MovieListFragment.class.getSimpleName();
     private final String MOVIE_LIST_KEY = "MovieListFragment_Movie_Data";
+    private final String SORT_PREFERENCE_KEY = "sort_by_pref";
 
     @Bind(R.id.gridview_movies)
     GridView mGridView;
@@ -101,6 +106,55 @@ public class MovieListFragment extends Fragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String sortBy = null, sortOrder = null;
+
+
+        switch (item.getItemId()) {
+
+            case R.id.action_most_popular:
+                sortBy = TheMovieDbService.SORT_BY_POPULARITY;
+                sortOrder = TheMovieDbService.SORT_ORDER_DESC;
+                break;
+
+            case R.id.action_highest_rated:
+                sortBy = TheMovieDbService.SORT_BY_VOTE_AVERAGE;
+                sortOrder = TheMovieDbService.SORT_ORDER_DESC;
+                break;
+
+            case R.id.action_recent_releases:
+                sortBy = TheMovieDbService.SORT_BY_RELEASE_DATE;
+                sortOrder = TheMovieDbService.SORT_ORDER_DESC;
+                break;
+
+            case R.id.action_least_popular:
+                sortBy = TheMovieDbService.SORT_BY_POPULARITY;
+                sortOrder = TheMovieDbService.SORT_ORDER_ASC;
+                break;
+        }
+
+        if (!TextUtils.isEmpty(sortBy) && !TextUtils.isEmpty(sortOrder)) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+            String currentValue = getSortingPreference(prefs);
+            String newValue = String.format("%s.%s", sortBy, sortOrder);
+
+            if (!TextUtils.equals(currentValue, newValue)) {
+                SharedPreferences.Editor edit = prefs.edit();
+                edit.putString(SORT_PREFERENCE_KEY, newValue); // Save new value
+                edit.commit();
+
+                updateMovies();
+                return true;
+            }
+
+            return false;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
@@ -111,16 +165,23 @@ public class MovieListFragment extends Fragment {
         discoverMoviesTask.execute();
     }
 
+    private String getSortingPreference(SharedPreferences sharedPreferences) {
+        String defaultValue = String.format("%s.%s", TheMovieDbService.SORT_BY_POPULARITY, TheMovieDbService.SORT_ORDER_DESC);
+        return sharedPreferences.getString(SORT_PREFERENCE_KEY, defaultValue);
+    }
+
     public class DiscoverMoviesTask extends AsyncTask<String, Void, List<DiscoverMovieResult>> {
 
         private final String LOG_TAG = DiscoverMoviesTask.class.getSimpleName();
 
         @Override
         protected List<DiscoverMovieResult> doInBackground(String... params) {
+            SharedPreferences sharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(getContext());
 
             try {
                 return new TheMovieDbService(getContext())
-                        .discoverMovies(TheMovieDbService.SORT_BY_POPULARITY, TheMovieDbService.SORT_ORDER_DESC);
+                        .discoverMovies(getSortingPreference(sharedPreferences));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 return null;

@@ -3,12 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".app.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_most_popular"
         android:orderInCategory="100"
         android:title="@string/action_most_popular"
@@ -19,18 +13,13 @@
         android:title="@string/action_highest_rated"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_most_voted"
-        android:orderInCategory="110"
-        android:title="@string/action_most_voted"
+        android:id="@+id/action_recent_releases"
+        android:orderInCategory="115"
+        android:title="@string/action_recent_releases"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_least_popular"
         android:orderInCategory="400"
         android:title="@string/action_least_popular"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_least_voted"
-        android:orderInCategory="405"
-        android:title="@string/action_least_voted"
         app:showAsAction="never" />
 </menu>

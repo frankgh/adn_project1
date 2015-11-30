@@ -3,10 +3,9 @@
     <string name="action_settings">Settings</string>
 
     <string name="action_most_popular">Most Popular</string>
-    <string name="action_highest_rated">Highest Rated</string>
+    <string name="action_highest_rated">Rating</string>
+    <string name="action_recent_releases">Recent Releases</string>
     <string name="action_least_popular">Least Popular</string>
-    <string name="action_most_voted">Best Voted</string>
-    <string name="action_least_voted">Lowest Voted</string>
 
     <string name="grid_item_movie_poster_image">Poster Image</string>
 

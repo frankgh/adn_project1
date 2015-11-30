@@ -16,7 +16,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by francisco on 11/24/15.
@@ -24,7 +27,13 @@ import java.util.List;
 public class TheMovieDbService {
 
     public final static String SORT_BY_POPULARITY = "popularity";
-    public final static String SORT_BY_RATING = "vote_average";
+    public final static String SORT_BY_VOTE_AVERAGE = "vote_average";
+    public final static String SORT_BY_RELEASE_DATE = "release_date";
+    public final static String SORT_BY_REVENUE = "revenue";
+    public final static String SORT_BY_PRIMARY_RELEASE_DATE = "primary_release_date";
+    public final static String SORT_BY_ORIGINAL_TITLE = "original_title";
+    public final static String SORT_BY_VOTE_COUNT = "vote_count";
+
     public final static String SORT_ORDER_ASC = "asc";
     public final static String SORT_ORDER_DESC = "desc";
     private final String LOG_TAG = TheMovieDbService.class.getSimpleName();
@@ -34,10 +43,10 @@ public class TheMovieDbService {
         mContext = context;
     }
 
-    public List<DiscoverMovieResult> discoverMovies(String orderBy, String sortOrder) {
+    public List<DiscoverMovieResult> discoverMovies(String sortBy) {
         String discoverMoviesUriString = mContext.getString(R.string.tmdb_discover_api_url);
 
-        Uri discoverMoviesUri = buildUri(discoverMoviesUriString, orderBy, sortOrder);
+        Uri discoverMoviesUri = buildUri(discoverMoviesUriString, sortBy);
         String responseText = getResponseTextFromUri(discoverMoviesUri);
         DiscoverMovieResponse response = null;
 
@@ -62,6 +71,8 @@ public class TheMovieDbService {
 
         // Will contain the raw JSON response as a string.
         String responseText = null;
+
+        Log.d(LOG_TAG, "Loading URL " + builtUri.toString());
 
         try {
             URL url = new URL(builtUri.toString());
@@ -105,19 +116,21 @@ public class TheMovieDbService {
         }
     }
 
-    private Uri buildUri(String uriString, String sortBy, String sortOrder) {
+    private Uri buildUri(String uriString, String sortBy) {
         final String SORT_BY_PARAM = "sort_by";
         final String API_KEY_PARAM = "api_key";
+        final String RELEASE_DATE_LTE_PARAM = "release_date.lte";
 
         Uri.Builder builder = Uri.parse(uriString).buildUpon()
                 .appendQueryParameter(API_KEY_PARAM, mContext.getString(R.string.the_movie_db_api_key));
 
         if (!TextUtils.isEmpty(sortBy)) {
-            if (TextUtils.isEmpty(sortOrder)) {
-                sortOrder = SORT_ORDER_DESC; // Set the default sort order
-            }
+            builder = builder.appendQueryParameter(SORT_BY_PARAM, sortBy);
 
-            builder = builder.appendQueryParameter(SORT_BY_PARAM, String.format("%s.%s", sortBy, sortOrder));
+            if (sortBy.indexOf(SORT_BY_RELEASE_DATE) == 0) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                builder = builder.appendQueryParameter(RELEASE_DATE_LTE_PARAM, sdf.format(new Date()));
+            }
         }
 
         return builder.build();

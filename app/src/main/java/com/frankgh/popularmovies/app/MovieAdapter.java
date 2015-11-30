@@ -7,10 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -28,25 +29,63 @@ public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
         super(context, resource, objects);
     }
 
+    /**
+     * Binds movie data to the view. For the image, we try to load from cache first. If that fails
+     * we load from the network
+     *
+     * @param itemView  the view
+     * @param movieData movie data
+     */
+    private void bindMovieDataToView(View itemView, final DiscoverMovieResult movieData) {
+        final ImageView posterImageView = (ImageView) itemView.findViewById(R.id.posterImageView);
+        posterImageView.setContentDescription(movieData.getTitle());
+
+        if (movieData.getPosterAbsolutePath() != null) {
+            Picasso.with(getContext())
+                    .load(movieData.getPosterAbsolutePath())
+                    .placeholder(R.drawable.ic_movie_icon)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(posterImageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                        }
+
+                        @Override
+                        public void onError() {
+                            posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                            //Try again online if cache failed
+                            Picasso.with(getContext())
+                                    .load(movieData.getPosterAbsolutePath())
+                                    .error(R.drawable.ic_error_24dp)
+                                    .into(posterImageView, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.v(LOG_TAG, "Could not fetch image from " + movieData.getPosterAbsolutePath());
+                                            posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                        }
+                                    });
+                        }
+                    });
+        } else {
+            posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            posterImageView.setImageResource(R.drawable.ic_movie_icon);
+        }
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        DiscoverMovieResult movie = getItem(position);
-
-        Log.d(LOG_TAG, "inflating " + movie.getTitle());
-
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_item_movie, parent, false);
         }
 
-        ImageView posterImageView = (ImageView) convertView.findViewById(R.id.posterImageView);
-        TextView textView = (TextView) convertView.findViewById(R.id.movieTitle);
-
-        textView.setText(movie.getTitle());
-        Picasso.with(getContext())
-                .load(movie.getPosterAbsolutePath())
-                .placeholder(android.R.drawable.ic_media_play)
-                .into(posterImageView);
+        bindMovieDataToView(convertView, getItem(position));
 
         return convertView;
     }

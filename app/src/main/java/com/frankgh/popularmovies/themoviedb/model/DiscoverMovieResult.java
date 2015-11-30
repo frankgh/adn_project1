@@ -2,6 +2,7 @@ package com.frankgh.popularmovies.themoviedb.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.frankgh.popularmovies.util.AndroidUtil;
 import com.google.gson.annotations.SerializedName;
@@ -26,7 +27,7 @@ public class DiscoverMovieResult implements Parcelable {
     };
 
     private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
-    private final String DEFAULT_IMAGE_SIZE = "w342";
+    private final String DEFAULT_IMAGE_SIZE = "w185";
 
     @SerializedName("backdrop_path")
     private String backdropPath;
@@ -141,6 +142,9 @@ public class DiscoverMovieResult implements Parcelable {
      * @return the absolute path for the given imageSize
      */
     public String getPosterAbsolutePath(String imageSize) {
+        if (TextUtils.isEmpty(posterPath)) {
+            return null;
+        }
         return "http://image.tmdb.org/t/p/" + imageSize + getPosterPath();
     }
 
@@ -161,7 +165,14 @@ public class DiscoverMovieResult implements Parcelable {
      * @return the absolute path for the given imageSize
      */
     public String getBackDropAbsolutePath(String imageSize) {
+        if (TextUtils.isEmpty(backdropPath)) {
+            return null;
+        }
         return "http://image.tmdb.org/t/p/" + imageSize + getBackdropPath();
+    }
+
+    public double getVoteAverage(Double maxVote) {
+        return getVoteAverage().doubleValue() * 10.0 / maxVote;
     }
 
     public void writeToParcel(Parcel out, int flags) {
