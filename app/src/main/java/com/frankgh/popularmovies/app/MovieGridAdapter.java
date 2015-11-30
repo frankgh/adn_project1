@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
@@ -14,6 +15,8 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -21,11 +24,11 @@ import butterknife.ButterKnife;
 /**
  * Created by francisco on 11/25/15.
  */
-public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
+public class MovieGridAdapter extends ArrayAdapter<DiscoverMovieResult> {
 
-    private final String LOG_TAG = MovieAdapter.class.getSimpleName();
+    private final String LOG_TAG = MovieGridAdapter.class.getSimpleName();
 
-    public MovieAdapter(Context context, int resource, List<DiscoverMovieResult> objects) {
+    public MovieGridAdapter(Context context, int resource, List<DiscoverMovieResult> objects) {
         super(context, resource, objects);
     }
 
@@ -37,13 +40,18 @@ public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
      * @param movieData movie data
      */
     private void bindMovieDataToView(View itemView, final DiscoverMovieResult movieData) {
+        final TextView voteAvgText = (TextView) itemView.findViewById(R.id.grid_item_movie_vote_average);
+        NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
+        voteAvgText.setText(voteAvgFormatter.format(movieData.getVoteAverage(5.0)));
+
         final ImageView posterImageView = (ImageView) itemView.findViewById(R.id.posterImageView);
         posterImageView.setContentDescription(movieData.getTitle());
+        posterImageView.setPadding(0, 0, 0, 0); // clear padding
 
         if (movieData.getPosterAbsolutePath() != null) {
             Picasso.with(getContext())
                     .load(movieData.getPosterAbsolutePath())
-                    .placeholder(R.drawable.ic_movie_icon)
+                    .placeholder(R.drawable.ic_movie_placeholder)
                     .networkPolicy(NetworkPolicy.OFFLINE)
                     .into(posterImageView, new Callback() {
                         @Override
@@ -74,7 +82,8 @@ public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
                     });
         } else {
             posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            posterImageView.setImageResource(R.drawable.ic_movie_icon);
+            posterImageView.setImageResource(R.drawable.ic_movie_placeholder); // set default placeholder
+            posterImageView.setPadding(100, 100, 100, 100); // add padding
         }
     }
 
@@ -85,7 +94,8 @@ public class MovieAdapter extends ArrayAdapter<DiscoverMovieResult> {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_item_movie, parent, false);
         }
 
-        bindMovieDataToView(convertView, getItem(position));
+        DiscoverMovieResult movieData = getItem(position);
+        bindMovieDataToView(convertView, movieData);
 
         return convertView;
     }
