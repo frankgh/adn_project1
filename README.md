@@ -9,3 +9,7 @@ To setup the "TheMovieDB" API Key create a *private_keys.xml* file under **app/s
     <string name="the_movie_db_api_key">YOUR_API_KEY_HERE</string>
 </resources>
 ```
+
+## References
+
+Based some of the layouts on mladenbabic's layouts for the Popular Movies project
