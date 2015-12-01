@@ -40,6 +40,9 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     @Bind(R.id.gridview_movies)
     GridView mGridView;
 
+    @Bind(R.id.pull_to_refresh)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
     private MovieGridAdapter mMovieGridAdapter;
     private List<DiscoverMovieResult> mMovieList;
 
@@ -87,6 +90,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 startActivity(detailIntent);
             }
         });
+
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         return rootView;
     }
@@ -160,6 +165,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void updateMovies() {
+        mSwipeRefreshLayout.setRefreshing(true);
         DiscoverMoviesTask discoverMoviesTask = new DiscoverMoviesTask();
         discoverMoviesTask.execute();
     }
@@ -193,6 +199,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             if (mMovieList != null) {
                 mMovieGridAdapter.swapData(mMovieList);
             }
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 }

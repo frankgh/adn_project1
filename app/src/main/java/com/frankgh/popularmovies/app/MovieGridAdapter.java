@@ -44,8 +44,7 @@ public class MovieGridAdapter extends ArrayAdapter<DiscoverMovieResult> {
         movieTitleText.setText(movieData.getTitle());
 
         final TextView voteAvgText = (TextView) itemView.findViewById(R.id.grid_item_movie_vote_average);
-        NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
-        voteAvgText.setText(voteAvgFormatter.format(movieData.getVoteAverage()));
+        voteAvgText.setText(movieData.getFormattedVoteAverage());
 
         final ImageView posterImageView = (ImageView) itemView.findViewById(R.id.posterImageView);
         posterImageView.setContentDescription(movieData.getTitle());

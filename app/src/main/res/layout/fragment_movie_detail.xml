@@ -5,5 +5,8 @@
     tools:context="com.frankgh.popularmovies.app.MovieDetailActivityFragment"
     tools:showIn="@layout/activity_movie_detail">
 
+    <include layout="@layout/header_movie_detail" />
+
+    <include layout="@layout/body_movie_detail" />
 
 </android.support.design.widget.CoordinatorLayout>

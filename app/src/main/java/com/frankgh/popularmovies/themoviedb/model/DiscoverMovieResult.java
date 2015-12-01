@@ -3,12 +3,18 @@ package com.frankgh.popularmovies.themoviedb.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.frankgh.popularmovies.util.AndroidUtil;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by francisco on 11/25/15.
@@ -27,7 +33,6 @@ public class DiscoverMovieResult implements Parcelable {
     };
 
     private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
-    private final String DEFAULT_IMAGE_SIZE = "w185";
 
     @SerializedName("backdrop_path")
     private String backdropPath;
@@ -131,7 +136,7 @@ public class DiscoverMovieResult implements Parcelable {
      * @return the absolute path
      */
     public String getPosterAbsolutePath() {
-        return getPosterAbsolutePath(DEFAULT_IMAGE_SIZE);
+        return getPosterAbsolutePath("w185");
     }
 
     /**
@@ -154,7 +159,7 @@ public class DiscoverMovieResult implements Parcelable {
      * @return the absolute path
      */
     public String getBackDropAbsolutePath() {
-        return getBackDropAbsolutePath(DEFAULT_IMAGE_SIZE);
+        return getBackDropAbsolutePath("w300");
     }
 
     /**
@@ -169,6 +174,32 @@ public class DiscoverMovieResult implements Parcelable {
             return null;
         }
         return "http://image.tmdb.org/t/p/" + imageSize + getBackdropPath();
+    }
+
+    public String getFormattedReleaseDate() {
+        if (TextUtils.isEmpty(getReleaseDate())) {
+            return getReleaseDate();
+        }
+
+        try {
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Date releaseDate = inputDateFormat.parse(getReleaseDate());
+
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMMM yyyy", Locale.US);
+            return outputDateFormat.format(releaseDate);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Unable to parse date '" + getReleaseDate() + "'", e);
+        }
+        return getReleaseDate();
+    }
+
+    public String getFormattedVoteAverage() {
+        if (getVoteAverage() == null) {
+            return "N/A";
+        }
+
+        NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
+        return voteAvgFormatter.format(getVoteAverage());
     }
 
     public void writeToParcel(Parcel out, int flags) {

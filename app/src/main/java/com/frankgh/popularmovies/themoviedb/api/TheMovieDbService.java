@@ -72,8 +72,6 @@ public class TheMovieDbService {
         // Will contain the raw JSON response as a string.
         String responseText = null;
 
-        Log.d(LOG_TAG, "Loading URL " + builtUri.toString());
-
         try {
             URL url = new URL(builtUri.toString());
 

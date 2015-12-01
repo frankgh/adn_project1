@@ -19,11 +19,11 @@ public class Global extends Application {
      * Configures Picasso defaults
      */
     private void configurePicasso() {
-        Picasso built = new Picasso.Builder(this)
+        Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttpDownloader(this, Integer.MAX_VALUE))
                 .build();
-        //built.setIndicatorsEnabled(true);
-        //built.setLoggingEnabled(true);
-        Picasso.setSingletonInstance(built);
+        //picasso.setIndicatorsEnabled(true);
+        //picasso.setLoggingEnabled(true);
+        Picasso.setSingletonInstance(picasso);
     }
 }
