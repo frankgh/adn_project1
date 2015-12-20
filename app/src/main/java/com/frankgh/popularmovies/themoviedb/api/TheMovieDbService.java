@@ -1,11 +1,13 @@
 package com.frankgh.popularmovies.themoviedb.api;
 
 import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
-
-import java.util.List;
+import com.frankgh.popularmovies.themoviedb.model.MovieReviewsResponse;
+import com.frankgh.popularmovies.themoviedb.model.MovieVideosResponse;
 
 import retrofit.Call;
+import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -14,7 +16,19 @@ import retrofit.http.Query;
 public interface TheMovieDbService {
 
     @POST("/discover/movie")
-    Call<List<DiscoverMovieResult>> login(@Query("api_key") String apiKey, @Query("sort_by") String sortBy);
+    Call<DiscoverMovieResult> discoverMovies(
+            @Query("api_key") String apiKey,
+            @Query("sort_by") String sortBy);
+
+    @GET("/movie/{id}/videos")
+    Call<MovieVideosResponse> movieVideos(
+            @Path("id") String id);
+
+    @GET("/movie/{id}/reviews")
+    Call<MovieReviewsResponse> movieReviews(
+            @Path("id") String id,
+            @Query("page") Integer page,
+            @Query("append_to_response") String appendToResponse);
 
 }
 //public class TheMovieDbService {
