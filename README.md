@@ -2,14 +2,22 @@
 
 ## Setting up the project
 
-To setup the "TheMovieDB" API Key create a *private_keys.xml* file under **app/src/main/res/values** with the following content:
+To setup the "TheMovieDB" API Key *app/build.gradle*, and change the following line:
 
 ```
-<resources>
-    <string name="the_movie_db_api_key">YOUR_API_KEY_HERE</string>
-</resources>
+        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', "API_KEY"
 ```
+
+with a valid API_KEY for the **The Movie DB** API Service.
 
 ## References
 
 Based some of the layouts on mladenbabic's layouts for the Popular Movies project
+
+## Third Party Libraries
+
+* Gson
+* Butterknife
+* Picasso
+* OkHttp
+* Retrofit
