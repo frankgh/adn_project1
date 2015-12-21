@@ -1,6 +1,6 @@
 package com.frankgh.popularmovies.themoviedb.api;
 
-import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
+import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResponse;
 import com.frankgh.popularmovies.themoviedb.model.MovieReviewsResponse;
 import com.frankgh.popularmovies.themoviedb.model.MovieVideosResponse;
 
@@ -15,16 +15,26 @@ import retrofit.http.Query;
  */
 public interface TheMovieDbService {
 
-    @POST("/discover/movie")
-    Call<DiscoverMovieResult> discoverMovies(
-            @Query("api_key") String apiKey,
+    public final static String SORT_BY_POPULARITY = "popularity";
+    public final static String SORT_BY_VOTE_AVERAGE = "vote_average";
+    public final static String SORT_BY_RELEASE_DATE = "release_date";
+    public final static String SORT_BY_REVENUE = "revenue";
+    public final static String SORT_BY_PRIMARY_RELEASE_DATE = "primary_release_date";
+    public final static String SORT_BY_ORIGINAL_TITLE = "original_title";
+    public final static String SORT_BY_VOTE_COUNT = "vote_count";
+
+    public final static String SORT_ORDER_ASC = "asc";
+    public final static String SORT_ORDER_DESC = "desc";
+
+    @POST("/3/discover/movie")
+    Call<DiscoverMovieResponse> discoverMovies(
             @Query("sort_by") String sortBy);
 
-    @GET("/movie/{id}/videos")
+    @GET("/3/movie/{id}/videos")
     Call<MovieVideosResponse> movieVideos(
             @Path("id") String id);
 
-    @GET("/movie/{id}/reviews")
+    @GET("/3/movie/{id}/reviews")
     Call<MovieReviewsResponse> movieReviews(
             @Path("id") String id,
             @Query("page") Integer page,

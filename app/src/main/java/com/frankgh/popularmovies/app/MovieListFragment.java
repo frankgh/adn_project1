@@ -18,6 +18,8 @@ import android.widget.GridView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.themoviedb.api.TheMovieDbService;
+import com.frankgh.popularmovies.themoviedb.api.TheMovieDbServiceFactory;
+import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResponse;
 import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Response;
 
 /**
  * Fragment that loads Movie data from the api and loads it into the gridview.
@@ -185,12 +188,16 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                     .getDefaultSharedPreferences(getContext());
 
             try {
-                return new TheMovieDbService(getContext())
-                        .discoverMovies(getSortingPreference(sharedPreferences));
+                Response<DiscoverMovieResponse> response = TheMovieDbServiceFactory.getService()
+                        .discoverMovies(getSortingPreference(sharedPreferences)).execute();
+
+                if (response != null && response.isSuccess() && response.body() != null) {
+                    return response.body().getResults();
+                }
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
-                return null;
             }
+            return null;
         }
 
         @Override
