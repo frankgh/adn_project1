@@ -10,9 +10,7 @@
 
     <string name="activity_movie_detail_synopsis">Synopsis</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_movie_detail">MovieDetailActivity</string>
+    <string name="title_activity_movie_detail">Movie Detail</string>
 
 
 </resources>
