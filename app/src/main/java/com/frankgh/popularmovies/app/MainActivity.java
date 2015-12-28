@@ -12,6 +12,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 

@@ -1,5 +1,6 @@
 package com.frankgh.popularmovies.themoviedb.api;
 
+import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.frankgh.popularmovies.BuildConfig;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
@@ -36,6 +37,7 @@ public class TheMovieDbServiceFactory {
 
         // Add the interceptor to OkHttpClient
         OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.interceptors().add(new StethoInterceptor());
         okHttpClient.interceptors().add(interceptor);
 
         Retrofit retrofit = new Retrofit.Builder()

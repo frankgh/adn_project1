@@ -33,8 +33,13 @@ import butterknife.ButterKnife;
 public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private int mPosition = GridView.INVALID_POSITION;
-
+    // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_MOVIE_TITLE = 1;
+    static final int COL_MOVIE_VOTE_AVERAGE = 2;
+    static final int COL_MOVIE_BACKDROP_PATH = 3;
+    static final int COL_MOVIE_POSTER_PATH = 4;
     private static final int MOVIE_LOADER = 0;
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -45,26 +50,15 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
             MoviesContract.MovieEntry.COLUMN_POSTER_PATH
     };
-
-    // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
-    // must change.
-    static final int COL_MOVIE_ID = 0;
-    static final int COL_MOVIE_TITLE = 1;
-    static final int COL_MOVIE_VOTE_AVERAGE = 2;
-    static final int COL_MOVIE_BACKDROP_PATH = 3;
-    static final int COL_MOVIE_POSTER_PATH = 4;
-
+    private static final String SELECTED_KEY = "selected_position";
     private final String LOG_TAG = MovieListFragment.class.getSimpleName();
     private final String MOVIE_LIST_KEY = "MovieListFragment_Movie_Data";
     private final String SORT_PREFERENCE_KEY = "sort_by_pref";
-    private static final String SELECTED_KEY = "selected_position";
-
     @Bind(R.id.gridview_movies)
     GridView mGridView;
-
     @Bind(R.id.pull_to_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private int mPosition = GridView.INVALID_POSITION;
     //private MovieGridAdapter mMovieGridAdapter;
     private MovieAdapter mMovieAdapter;
 
@@ -94,7 +88,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
 
         // The cursor adapter for the movies
-        mMovieAdapter = new MovieAdapter(getActivity(), null,0);
+        mMovieAdapter = new MovieAdapter(getActivity(), null, 0);
 //        // the adapter for the movies
 //        mMovieGridAdapter = new MovieGridAdapter(
 //                getActivity(), // context
@@ -202,9 +196,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     private void updateMovies() {
         mSwipeRefreshLayout.setRefreshing(true);
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
-
-        //DiscoverMoviesTask discoverMoviesTask = new DiscoverMoviesTask();
-        //discoverMoviesTask.execute();
+//        DiscoverMoviesTask discoverMoviesTask = new DiscoverMoviesTask();
+//        discoverMoviesTask.execute();
     }
 
     private String getSortingPreference(SharedPreferences sharedPreferences) {
@@ -265,10 +258,10 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 //
 //        @Override
 //        protected void onPostExecute(List<DiscoverMovieResult> results) {
-//            mMovieList = results;
-//            if (mMovieList != null) {
-//                mMovieGridAdapter.swapData(mMovieList);
-//            }
+////            mMovieList = results;
+////            if (mMovieList != null) {
+////                mMovieGridAdapter.swapData(mMovieList);
+////            }
 //            mSwipeRefreshLayout.setRefreshing(false);
 //        }
 //    }

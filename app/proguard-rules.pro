@@ -15,6 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Butterknife
+
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
 -keep class **$$ViewBinder { *; }
@@ -27,7 +30,13 @@
     @butterknife.* <methods>;
 }
 
+# Retrofit
+
 -dontwarn retrofit.**
 -keep class retrofit.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+# Stetho
+
+-keep class com.facebook.stetho.**{ *; }
