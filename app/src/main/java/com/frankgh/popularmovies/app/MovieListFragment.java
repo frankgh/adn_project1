@@ -1,11 +1,13 @@
 package com.frankgh.popularmovies.app;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,28 +19,45 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.frankgh.popularmovies.R;
+import com.frankgh.popularmovies.data.MoviesContract;
 import com.frankgh.popularmovies.themoviedb.api.TheMovieDbService;
-import com.frankgh.popularmovies.themoviedb.api.TheMovieDbServiceFactory;
-import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResponse;
-import com.frankgh.popularmovies.themoviedb.model.DiscoverMovieResult;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import retrofit.Response;
 
 /**
  * Fragment that loads Movie data from the api and loads it into the gridview.
  *
  * @author francisco <email>frank.guerrero@gmail.com</email>
  */
-public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MovieListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
+
+    private int mPosition = GridView.INVALID_POSITION;
+
+    private static final int MOVIE_LOADER = 0;
+    // For the movie view we're showing only a small subset of the stored data.
+    // Specify the columns we need.
+    private static final String[] MOVIE_COLUMNS = {
+            MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
+            MoviesContract.MovieEntry.COLUMN_TITLE,
+            MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
+            MoviesContract.MovieEntry.COLUMN_POSTER_PATH
+    };
+
+    // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_MOVIE_TITLE = 1;
+    static final int COL_MOVIE_VOTE_AVERAGE = 2;
+    static final int COL_MOVIE_BACKDROP_PATH = 3;
+    static final int COL_MOVIE_POSTER_PATH = 4;
 
     private final String LOG_TAG = MovieListFragment.class.getSimpleName();
     private final String MOVIE_LIST_KEY = "MovieListFragment_Movie_Data";
     private final String SORT_PREFERENCE_KEY = "sort_by_pref";
+    private static final String SELECTED_KEY = "selected_position";
 
     @Bind(R.id.gridview_movies)
     GridView mGridView;
@@ -46,10 +65,8 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     @Bind(R.id.pull_to_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private MovieGridAdapter mMovieGridAdapter;
-    private List<DiscoverMovieResult> mMovieList;
-
-    private boolean mLoadData;
+    //private MovieGridAdapter mMovieGridAdapter;
+    private MovieAdapter mMovieAdapter;
 
     public static Fragment newInstance() {
         return new MovieListFragment();
@@ -60,11 +77,10 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true); // Handle menu events
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
-            mMovieList = new ArrayList<DiscoverMovieResult>();
-            mLoadData = true;
-        } else {
-            mMovieList = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
     }
 
@@ -76,21 +92,37 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         View rootView = inflater.inflate(R.layout.fragment_movie_list, container, false);
         ButterKnife.bind(this, rootView);
 
-        // the adapter for the movies
-        mMovieGridAdapter = new MovieGridAdapter(
-                getActivity(), // context
-                R.layout.grid_item_movie, // the layout id for the movie view
-                mMovieList // the movie data
-        );
 
-        mGridView.setAdapter(mMovieGridAdapter); // Attach the adapter to the gridview
+        // The cursor adapter for the movies
+        mMovieAdapter = new MovieAdapter(getActivity(), null,0);
+//        // the adapter for the movies
+//        mMovieGridAdapter = new MovieGridAdapter(
+//                getActivity(), // context
+//                R.layout.grid_item_movie, // the layout id for the movie view
+//                mMovieList // the movie data
+//        );
+
+        mGridView.setAdapter(mMovieAdapter);
+        //mGridView.setAdapter(mMovieGridAdapter); // Attach the adapter to the gridview
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                DiscoverMovieResult movieData = mMovieList.get(position);
-                Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
-                detailIntent.putExtra(MovieDetailActivity.MOVIE_DETAIL_KEY, movieData);
-                startActivity(detailIntent);
+
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+//                if (cursor != null) {
+//                    String locationSetting = Utility.getPreferredLocation(getActivity());
+//                    ((Callback) getActivity())
+//                            .onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+//                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
+//                            ));
+//                }
+                mPosition = position;
+
+
+                //DiscoverMovieResult movieData = mMovieList.get(position);
+                //Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
+                //detailIntent.putExtra(MovieDetailActivity.MOVIE_DETAIL_KEY, movieData);
+                //startActivity(detailIntent);
             }
         });
 
@@ -100,22 +132,22 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onRefresh() {
         Log.d(LOG_TAG, "Reloading movies");
         updateMovies();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (mLoadData) {
-            updateMovies();
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(MOVIE_LIST_KEY, (ArrayList<DiscoverMovieResult>) mMovieList);
+        if (mPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -169,8 +201,10 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     private void updateMovies() {
         mSwipeRefreshLayout.setRefreshing(true);
-        DiscoverMoviesTask discoverMoviesTask = new DiscoverMoviesTask();
-        discoverMoviesTask.execute();
+        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+
+        //DiscoverMoviesTask discoverMoviesTask = new DiscoverMoviesTask();
+        //discoverMoviesTask.execute();
     }
 
     private String getSortingPreference(SharedPreferences sharedPreferences) {
@@ -178,35 +212,64 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         return sharedPreferences.getString(SORT_PREFERENCE_KEY, defaultValue);
     }
 
-    public class DiscoverMoviesTask extends AsyncTask<String, Void, List<DiscoverMovieResult>> {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //SharedPreferences sharedPreferences = PreferenceManager
+        //        .getDefaultSharedPreferences(getContext());
+        //String sortOrder = getSortingPreference(sharedPreferences);
 
-        private final String LOG_TAG = DiscoverMoviesTask.class.getSimpleName();
+        return new CursorLoader(getActivity(),
+                MoviesContract.MovieEntry.CONTENT_URI,
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null);
+    }
 
-        @Override
-        protected List<DiscoverMovieResult> doInBackground(String... params) {
-            SharedPreferences sharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(getContext());
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mMovieAdapter.swapCursor(data);
 
-            try {
-                Response<DiscoverMovieResponse> response = TheMovieDbServiceFactory.getService()
-                        .discoverMovies(getSortingPreference(sharedPreferences)).execute();
-
-                if (response != null && response.isSuccess() && response.body() != null) {
-                    return response.body().getResults();
-                }
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<DiscoverMovieResult> results) {
-            mMovieList = results;
-            if (mMovieList != null) {
-                mMovieGridAdapter.swapData(mMovieList);
-            }
-            mSwipeRefreshLayout.setRefreshing(false);
+        if (mPosition != GridView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mGridView.smoothScrollToPosition(mPosition);
         }
     }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mMovieAdapter.swapCursor(null);
+    }
+
+//    public class DiscoverMoviesTask extends AsyncTask<String, Void, List<DiscoverMovieResult>> {
+//
+//        private final String LOG_TAG = DiscoverMoviesTask.class.getSimpleName();
+//
+//        @Override
+//        protected List<DiscoverMovieResult> doInBackground(String... params) {
+//            SharedPreferences sharedPreferences = PreferenceManager
+//                    .getDefaultSharedPreferences(getContext());
+//
+//            try {
+//                Response<DiscoverMovieResponse> response = TheMovieDbServiceFactory.getService()
+//                        .discoverMovies(getSortingPreference(sharedPreferences)).execute();
+//
+//                if (response != null && response.isSuccess() && response.body() != null) {
+//                    return response.body().getResults();
+//                }
+//            } catch (Exception e) {
+//                Log.e(LOG_TAG, e.getMessage(), e);
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(List<DiscoverMovieResult> results) {
+//            mMovieList = results;
+//            if (mMovieList != null) {
+//                mMovieGridAdapter.swapData(mMovieList);
+//            }
+//            mSwipeRefreshLayout.setRefreshing(false);
+//        }
+//    }
 }
