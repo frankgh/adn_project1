@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 public class MoviesProvider extends ContentProvider {
 
     static final int MOVIE = 100;
+    static final int MOVIE_WITH_ID = 105;
     static final int MOVIE_EXTRA = 200;
     static final int MOVIE_EXTRA_WITH_MOVIE_ID = 205;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -33,8 +34,10 @@ public class MoviesProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MoviesContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
+
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_EXTRA, MOVIE_EXTRA);
-        matcher.addURI(authority, MoviesContract.PATH_MOVIE_EXTRA + "/*", MOVIE_EXTRA_WITH_MOVIE_ID);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIE_EXTRA + "/#", MOVIE_EXTRA_WITH_MOVIE_ID);
 
         return matcher;
     }
@@ -128,7 +131,7 @@ public class MoviesProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case MOVIE: {
@@ -186,6 +189,8 @@ public class MoviesProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
+                return MoviesContract.MovieEntry.TABLE_NAME;
+            case MOVIE_WITH_ID:
                 return MoviesContract.MovieEntry.TABLE_NAME;
             case MOVIE_EXTRA:
                 return MoviesContract.MovieExtraEntry.TABLE_NAME;

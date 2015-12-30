@@ -34,7 +34,8 @@
 
         <provider
             android:name=".data.MoviesProvider"
-            android:authorities="com.frankgh.popularmovies.app" />
+            android:authorities="com.frankgh.popularmovies.app"
+            android:exported="false"/>
     </application>
 
 </manifest>

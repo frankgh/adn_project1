@@ -1,4 +1,5 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
 
@@ -12,5 +13,5 @@
 
     <string name="title_activity_movie_detail">Movie Detail</string>
 
-
+    <string name="format_vote_average"><xliff:g id="voteAvg">%1.1f</xliff:g></string>
 </resources>

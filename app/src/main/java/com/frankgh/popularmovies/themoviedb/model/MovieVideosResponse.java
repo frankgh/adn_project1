@@ -9,7 +9,7 @@ import java.util.List;
 public class MovieVideosResponse {
 
     private Integer id;
-    private List<Video> results = new ArrayList<Video>();
+    private List<Video> results = new ArrayList<>();
 
     public Integer getId() {
         return id;

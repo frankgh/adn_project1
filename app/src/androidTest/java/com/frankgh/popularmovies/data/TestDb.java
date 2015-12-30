@@ -50,6 +50,8 @@ public class TestDb extends AndroidTestCase {
             tableNameHashSet.remove(c.getString(0));
         } while (c.moveToNext());
 
+        c.close();
+
         // if this fails, it means that your database doesn't contain both the location entry
         // and weather entry tables
         assertTrue("Error: Your database was created without the billing address entry, " +
@@ -204,6 +206,8 @@ public class TestDb extends AndroidTestCase {
             String columnName = c.getString(columnNameIndex);
             columnHashSet.remove(columnName);
         } while (c.moveToNext());
+
+        c.close();
 
         // if this fails, it means that your database doesn't contain all of the required columns
         assertTrue("Error: The database doesn't contain all of the required columns for table " + tableName,

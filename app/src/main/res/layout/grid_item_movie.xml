@@ -11,28 +11,25 @@
         android:contentDescription="@string/grid_item_movie_poster_image"
         android:scaleType="fitCenter" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/grid_item_movie_pill"
         android:layout_width="match_parent"
         android:layout_height="@dimen/grid_item_movie_pill_height"
         android:layout_gravity="center_horizontal|bottom"
-        android:alpha="0.7"
-        android:background="@color/colorPrimaryTransparent"
-        android:gravity="center_vertical">
+        android:contentDescription="@string/grid_item_movie_poster_image"
+        android:gravity="center_vertical"
+        android:visibility="invisible"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/grid_item_movie_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/grid_item_movie_pill_item_margin"
             android:layout_marginLeft="@dimen/grid_item_movie_pill_item_margin"
             android:layout_marginRight="@dimen/grid_item_movie_pill_item_margin"
-            android:layout_marginStart="@dimen/grid_item_movie_pill_item_margin"
-            android:layout_toLeftOf="@+id/grid_item_movie_vote_average"
-            android:text="Movie Title"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:singleLine="false"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/black" />
 
@@ -40,10 +37,6 @@
             android:id="@+id/grid_item_movie_vote_average"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/grid_item_movie_title"
-            android:layout_toLeftOf="@+id/starImageView"
-            android:layout_toStartOf="@+id/starImageView"
-            android:text="5.0"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/black" />
 
@@ -51,12 +44,10 @@
             android:id="@+id/starImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/grid_item_movie_vote_average"
-            android:layout_marginEnd="@dimen/grid_item_movie_pill_item_margin"
             android:layout_marginRight="@dimen/grid_item_movie_pill_item_margin"
             android:src="@drawable/ic_star_16dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
+
+
 </FrameLayout>

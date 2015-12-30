@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * DiscoverMovieResponse class
+ *
  * Created by francisco on 11/25/15.
  */
 public class DiscoverMovieResponse implements Parcelable {
@@ -25,8 +27,8 @@ public class DiscoverMovieResponse implements Parcelable {
         }
     };
 
-    private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
-    private List<DiscoverMovieResult> results = new ArrayList<DiscoverMovieResult>();
+    private final String LOG_TAG = Movie.class.getSimpleName();
+    private List<Movie> results = new ArrayList<>();
     @SerializedName("total_pages")
     private Integer totalPages;
     @SerializedName("total_results")
@@ -41,13 +43,13 @@ public class DiscoverMovieResponse implements Parcelable {
             int N = in.readInt();
             results = new ArrayList<>(N);
             for (int i = 0; i < N; i++) {
-                results.add((DiscoverMovieResult)
-                        in.readParcelable(DiscoverMovieResult.class.getClassLoader()));
+                results.add((Movie)
+                        in.readParcelable(Movie.class.getClassLoader()));
             }
         }
     }
 
-    public List<DiscoverMovieResult> getResults() {
+    public List<Movie> getResults() {
         return results;
     }
 
@@ -72,7 +74,7 @@ public class DiscoverMovieResponse implements Parcelable {
 
         if (results != null) {
             dest.writeInt(results.size());
-            for (DiscoverMovieResult result : results) {
+            for (Movie result : results) {
                 dest.writeParcelable(result, 0);
             }
         }

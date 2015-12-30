@@ -4,11 +4,11 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="grid_item_movie_height">275dp</dimen>
-    <dimen name="grid_item_movie_pill_height">36dp</dimen>
-    <dimen name="grid_item_movie_pill_item_margin">5dp</dimen>
-    <dimen name="activity_movie_detail_app_bar_height">275dp</dimen>
+    <dimen name="grid_item_movie_pill_height">32dp</dimen>
+    <dimen name="grid_item_movie_pill_item_margin">3dp</dimen>
+    <dimen name="activity_movie_detail_app_bar_height">350dp</dimen>
+    <dimen name="activity_movie_detail_backdrop_image_height">225dp</dimen>
     <dimen name="movie_detail_poster_image_height">105dp</dimen>
     <dimen name="movie_detail_poster_image_width">75dp</dimen>
-    <dimen name="movie_detail_poster_margin_top">-5dp</dimen>
     <dimen name="movie_detail_poster_elevation">5dp</dimen>
 </resources>

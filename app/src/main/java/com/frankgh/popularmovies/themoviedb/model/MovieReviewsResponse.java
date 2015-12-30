@@ -10,7 +10,7 @@ public class MovieReviewsResponse {
 
     private Integer id;
     private Integer page;
-    private List<Review> results = new ArrayList<Review>();
+    private List<Review> results = new ArrayList<>();
     private Integer totalPages;
     private Integer totalResults;
 

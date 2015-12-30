@@ -14,10 +14,12 @@ import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 
 /**
+ * The Movie DB Service Factory
+ * <p/>
  * Created by Francisco on 12/13/2015.
  */
 public class TheMovieDbServiceFactory {
-    private static TheMovieDbService service;
+    private static final TheMovieDbService service;
 
     static {
 

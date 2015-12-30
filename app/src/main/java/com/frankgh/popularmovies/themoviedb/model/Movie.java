@@ -2,43 +2,38 @@ package com.frankgh.popularmovies.themoviedb.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.frankgh.popularmovies.util.AndroidUtil;
 import com.google.gson.annotations.SerializedName;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
+ * An object representing a Movie
+ *
  * Created by francisco on 11/25/15.
  */
-public class DiscoverMovieResult implements Parcelable {
+public class Movie implements Parcelable {
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
-    public static final Parcelable.Creator<DiscoverMovieResult> CREATOR = new Parcelable.Creator<DiscoverMovieResult>() {
-        public DiscoverMovieResult createFromParcel(Parcel in) {
-            return new DiscoverMovieResult(in);
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
         }
 
-        public DiscoverMovieResult[] newArray(int size) {
-            return new DiscoverMovieResult[size];
+        public Movie[] newArray(int size) {
+            return new Movie[size];
         }
     };
 
-    private final String LOG_TAG = DiscoverMovieResult.class.getSimpleName();
+    private final String LOG_TAG = Movie.class.getSimpleName();
 
     @SerializedName("backdrop_path")
     private String backdropPath;
     private Boolean adult;
     @SerializedName("genre_ids")
-    private List<Integer> genreIds = new ArrayList<Integer>();
+    private List<Integer> genreIds = new ArrayList<>();
     private Integer id;
     @SerializedName("original_language")
     private String originalLanguage;
@@ -57,7 +52,7 @@ public class DiscoverMovieResult implements Parcelable {
     @SerializedName("vote_count")
     private Integer voteCount;
 
-    private DiscoverMovieResult(Parcel in) {
+    public Movie(Parcel in) {
         backdropPath = AndroidUtil.readStringFromParcel(in);
         adult = AndroidUtil.readBooleanFromParcel(in);
         genreIds = AndroidUtil.readIntegerListFromParcel(in);
@@ -72,6 +67,17 @@ public class DiscoverMovieResult implements Parcelable {
         video = AndroidUtil.readBooleanFromParcel(in);
         voteAverage = AndroidUtil.readDoubleFromParcel(in);
         voteCount = AndroidUtil.readIntegerFromParcel(in);
+    }
+
+    public Movie(int id, String title, double voteAverage, String backdropPath,
+                 String posterPath, String releaseDate, String overview) {
+        this.id = id;
+        this.title = title;
+        this.voteAverage = voteAverage;
+        this.backdropPath = backdropPath;
+        this.posterPath = posterPath;
+        this.releaseDate = releaseDate;
+        this.overview = overview;
     }
 
     public Boolean getAdult() {
@@ -128,78 +134,6 @@ public class DiscoverMovieResult implements Parcelable {
 
     public Integer getVoteCount() {
         return voteCount;
-    }
-
-    /**
-     * Returns the Absolute Path to the poster image with a default size
-     *
-     * @return the absolute path
-     */
-    public String getPosterAbsolutePath() {
-        return getPosterAbsolutePath("w185");
-    }
-
-    /**
-     * Returns the Absolute Path to the poster image. Possible sizes are:
-     * w92, w154, w185, w342", "w500", "w780", or "original"
-     *
-     * @param imageSize one of the possible sizes: w92, w154, w185, w342, w500, w780, or original
-     * @return the absolute path for the given imageSize
-     */
-    public String getPosterAbsolutePath(String imageSize) {
-        if (TextUtils.isEmpty(posterPath)) {
-            return null;
-        }
-        return "http://image.tmdb.org/t/p/" + imageSize + getPosterPath();
-    }
-
-    /**
-     * Returns the Absolut Path the the backdrop image with a default size
-     *
-     * @return the absolute path
-     */
-    public String getBackDropAbsolutePath() {
-        return getBackDropAbsolutePath("w300");
-    }
-
-    /**
-     * Returns the Absolute Path to the backdrop image. Possible sizes are:
-     * w92, w154, w185, w342", "w500", "w780", or "original"
-     *
-     * @param imageSize one of the possible sizes: w92, w154, w185, w342, w500, w780, or original
-     * @return the absolute path for the given imageSize
-     */
-    public String getBackDropAbsolutePath(String imageSize) {
-        if (TextUtils.isEmpty(backdropPath)) {
-            return null;
-        }
-        return "http://image.tmdb.org/t/p/" + imageSize + getBackdropPath();
-    }
-
-    public String getFormattedReleaseDate() {
-        if (TextUtils.isEmpty(getReleaseDate())) {
-            return getReleaseDate();
-        }
-
-        try {
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            Date releaseDate = inputDateFormat.parse(getReleaseDate());
-
-            SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMMM yyyy", Locale.US);
-            return outputDateFormat.format(releaseDate);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Unable to parse date '" + getReleaseDate() + "'", e);
-        }
-        return getReleaseDate();
-    }
-
-    public String getFormattedVoteAverage() {
-        if (getVoteAverage() == null) {
-            return "N/A";
-        }
-
-        NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
-        return voteAvgFormatter.format(getVoteAverage());
     }
 
     public void writeToParcel(Parcel out, int flags) {

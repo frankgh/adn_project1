@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Parcelable Utilities
+ *
  * Created by francisco on 11/26/15.
  */
 public class AndroidUtil {
@@ -24,21 +26,21 @@ public class AndroidUtil {
     public static void writeToParcel(Integer value, Parcel out) {
         writeNullFlag(value, out);
         if (value != null) {
-            out.writeInt(value.intValue());
+            out.writeInt(value);
         }
     }
 
     public static void writeToParcel(Boolean value, Parcel out) {
         writeNullFlag(value, out);
         if (value != null) {
-            out.writeByte((byte) (value.booleanValue() ? 0 : 1));
+            out.writeByte((byte) (value ? 0 : 1));
         }
     }
 
     public static void writeToParcel(Double value, Parcel out) {
         writeNullFlag(value, out);
         if (value != null) {
-            out.writeDouble(value.doubleValue());
+            out.writeDouble(value);
         }
     }
 
@@ -73,7 +75,7 @@ public class AndroidUtil {
         boolean hasValue = (in.readByte() != 0);
 
         if (hasValue) {
-            List<Integer> list = new ArrayList<Integer>();
+            List<Integer> list = new ArrayList<>();
             int N = in.readInt();
             for (int i = 0; i < N; i++) {
                 list.add(in.readInt());

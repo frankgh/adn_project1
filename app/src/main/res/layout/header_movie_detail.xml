@@ -11,21 +11,33 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:fitsSystemWindows="true"
+        android:background="@android:color/white"
         app:contentScrim="?attr/colorPrimary"
         app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
         <ImageView
             android:id="@+id/backdrop_image_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/activity_movie_detail_backdrop_image_height"
             android:layout_marginTop="?attr/actionBarSize"
             android:scaleType="centerCrop"
             app:layout_collapseMode="parallax" />
+
+        <ImageView
+            android:id="@+id/posterImageView"
+            android:layout_width="@dimen/movie_detail_poster_image_width"
+            android:layout_height="@dimen/movie_detail_poster_image_height"
+            android:layout_gravity="left|bottom"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:contentDescription="@string/grid_item_movie_poster_image"
+            android:elevation="@dimen/movie_detail_poster_elevation"
+            android:fitsSystemWindows="true" />
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
             app:layout_collapseMode="pin" />
 
     </android.support.design.widget.CollapsingToolbarLayout>

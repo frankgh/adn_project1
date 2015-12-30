@@ -11,20 +11,22 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
+ * TheMovieDb Service Interface
+ * <p/>
  * Created by francisco on 11/24/15.
  */
 public interface TheMovieDbService {
 
-    public final static String SORT_BY_POPULARITY = "popularity";
-    public final static String SORT_BY_VOTE_AVERAGE = "vote_average";
-    public final static String SORT_BY_RELEASE_DATE = "release_date";
-    public final static String SORT_BY_REVENUE = "revenue";
-    public final static String SORT_BY_PRIMARY_RELEASE_DATE = "primary_release_date";
-    public final static String SORT_BY_ORIGINAL_TITLE = "original_title";
-    public final static String SORT_BY_VOTE_COUNT = "vote_count";
+    String SORT_BY_POPULARITY = "popularity";
+    String SORT_BY_VOTE_AVERAGE = "vote_average";
+    String SORT_BY_RELEASE_DATE = "release_date";
+    String SORT_BY_REVENUE = "revenue";
+    String SORT_BY_PRIMARY_RELEASE_DATE = "primary_release_date";
+    String SORT_BY_ORIGINAL_TITLE = "original_title";
+    String SORT_BY_VOTE_COUNT = "vote_count";
 
-    public final static String SORT_ORDER_ASC = "asc";
-    public final static String SORT_ORDER_DESC = "desc";
+    String SORT_ORDER_ASC = "asc";
+    String SORT_ORDER_DESC = "desc";
 
     @POST("/3/discover/movie")
     Call<DiscoverMovieResponse> discoverMovies(
@@ -60,7 +62,7 @@ public interface TheMovieDbService {
 //        mContext = context;
 //    }
 //
-//    public List<DiscoverMovieResult> discoverMovies(String sortBy) {
+//    public List<Movie> discoverMovies(String sortBy) {
 //        String discoverMoviesUriString = mContext.getString(R.string.tmdb_discover_api_url);
 //
 //        Uri discoverMoviesUri = buildUri(discoverMoviesUriString, sortBy);

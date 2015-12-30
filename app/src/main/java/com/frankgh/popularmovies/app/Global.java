@@ -8,11 +8,13 @@ import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 /**
+ * Application defaults
+ *
  * Created by francisco on 11/30/15.
  */
 public class Global extends Application {
 
-    public static final String LOG_TAG = Global.class.getSimpleName();
+    private static final String LOG_TAG = Global.class.getSimpleName();
 
     @Override
     public void onCreate() {

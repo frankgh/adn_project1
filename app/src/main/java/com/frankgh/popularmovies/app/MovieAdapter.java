@@ -2,7 +2,11 @@ package com.frankgh.popularmovies.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
+import com.frankgh.popularmovies.util.Utility;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -19,27 +24,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
+ * Movie Adapter that is based on CursorAdapter
+ * <p/>
  * Created by Francisco on 12/27/2015.
  */
 public class MovieAdapter extends CursorAdapter {
 
     private final String LOG_TAG = MovieAdapter.class.getSimpleName();
-
-    /**
-     * Cache of the children views for a movie list item.
-     */
-    public static class ViewHolder {
-        @Bind(R.id.grid_item_movie_title)
-        TextView movieTitleText;
-        @Bind(R.id.grid_item_movie_vote_average)
-        TextView voteAvgText;
-        @Bind(R.id.posterImageView)
-        ImageView posterImageView;
-
-        public ViewHolder(View view) {
-            ButterKnife.bind(this, view);
-        }
-    }
 
     public MovieAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -62,14 +53,14 @@ public class MovieAdapter extends CursorAdapter {
 
         // Read movie title from cursor
         final String movieTitle = cursor.getString(MovieListFragment.COL_MOVIE_TITLE);
-        viewHolder.movieTitleText.setText(movieTitle);
+        viewHolder.movieTitleView.setText(movieTitle);
 
         // Read vote average from cursor
-        final String voteAvgText = cursor.getString(MovieListFragment.COL_MOVIE_VOTE_AVERAGE);
-        viewHolder.voteAvgText.setText(voteAvgText);
+        final String voteAvgText = Utility.getFormattedVoteAverage(context, cursor.getDouble(MovieListFragment.COL_MOVIE_VOTE_AVERAGE));
+        viewHolder.voteAvgView.setText(voteAvgText);
 
         // Read the poster absolute path from cursor
-        final String posterAbsolutePath = cursor.getString(MovieListFragment.COL_MOVIE_POSTER_PATH);
+        final String posterAbsolutePath = Utility.getPosterAbsolutePath(cursor.getString(MovieListFragment.COL_MOVIE_POSTER_PATH));
 
         if (posterAbsolutePath != null) {
             Picasso.with(context)
@@ -79,6 +70,7 @@ public class MovieAdapter extends CursorAdapter {
                         @Override
                         public void onSuccess() {
                             viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            setPillPalette(viewHolder);
                         }
 
                         @Override
@@ -92,6 +84,7 @@ public class MovieAdapter extends CursorAdapter {
                                         @Override
                                         public void onSuccess() {
                                             viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                            setPillPalette(viewHolder);
                                         }
 
                                         @Override
@@ -109,6 +102,25 @@ public class MovieAdapter extends CursorAdapter {
         }
     }
 
+    private void setPillPalette(final ViewHolder holder) {
+        Bitmap bitmap = ((BitmapDrawable) holder.posterImageView.getDrawable()).getBitmap();
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch vibrant = palette.getVibrantSwatch();
+
+                if (vibrant != null) {
+                    holder.movieTitleView.setTextColor(vibrant.getTitleTextColor());
+                    holder.voteAvgView.setTextColor(vibrant.getTitleTextColor());
+                    holder.starImageView.setColorFilter(vibrant.getTitleTextColor());
+                    holder.moviePillView.setBackgroundColor(ColorUtils
+                            .setAlphaComponent(palette.getMutedColor(vibrant.getRgb()), 220));
+                    holder.moviePillView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
     @Override
     public int getItemViewType(int position) {
         return 0;
@@ -117,5 +129,25 @@ public class MovieAdapter extends CursorAdapter {
     @Override
     public int getViewTypeCount() {
         return 1;
+    }
+
+    /**
+     * Cache of the children views for a movie list item.
+     */
+    public static class ViewHolder {
+        @Bind(R.id.grid_item_movie_title)
+        TextView movieTitleView;
+        @Bind(R.id.grid_item_movie_vote_average)
+        TextView voteAvgView;
+        @Bind(R.id.posterImageView)
+        ImageView posterImageView;
+        @Bind(R.id.grid_item_movie_pill)
+        View moviePillView;
+        @Bind(R.id.starImageView)
+        ImageView starImageView;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }
