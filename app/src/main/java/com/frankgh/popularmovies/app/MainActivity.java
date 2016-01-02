@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         mTwoPane = findViewById(R.id.fragment_movie_detail) != null;
 
         if (mTwoPane && savedInstanceState == null) {
+            // Add Detail Fragment on two pane layouts
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_movie_detail, new MovieDetailActivityFragment(), DETAIL_FRAGMENT_TAG)
                     .commit();
