@@ -1,6 +1,5 @@
 package com.frankgh.popularmovies.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +28,7 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieDetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // These indices are tied to MOVIE_DETAIL_COLUMNS.  If MOVIE_DETAIL_COLUMNS changes, these
     // must change.
@@ -40,8 +39,9 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderManag
     static final int COL_MOVIE_POSTER_PATH = 4;
     static final int COL_MOVIE_RELEASE_DATE = 5;
     static final int COL_MOVIE_OVERVIEW = 6;
-    private static final int MOVIE_DETAIL_LOADER = 0;
 
+    static final String DETAIL_URI = "URI";
+    private static final int MOVIE_DETAIL_LOADER = 0;
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] MOVIE_DETAIL_COLUMNS = {
@@ -54,8 +54,8 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderManag
             MoviesContract.MovieEntry.COLUMN_OVERVIEW
     };
 
-    private static final String SELECTED_MOVIE_URI_KEY = "selected_movie_uri";
-    private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
+//    private static final String SELECTED_MOVIE_URI_KEY = "selected_movie_uri";
+    private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
     @Bind(R.id.posterImageView)
     ImageView mPosterImageView;
@@ -74,22 +74,22 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderManag
 
     private Uri mSelectedMovieUri;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (savedInstanceState == null || !savedInstanceState.containsKey(SELECTED_MOVIE_URI_KEY)) {
-            Intent intent = getActivity().getIntent();
-            if (intent == null) {
-                getActivity().onBackPressed(); // Invalid movie
-                return;
-            }
-
-            mSelectedMovieUri = intent.getData();
-        } else {
-            mSelectedMovieUri = savedInstanceState.getParcelable(SELECTED_MOVIE_URI_KEY);
-        }
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//
+////        if (savedInstanceState == null || !savedInstanceState.containsKey(SELECTED_MOVIE_URI_KEY)) {
+////            Intent intent = getActivity().getIntent();
+////            if (intent == null) {
+////                getActivity().onBackPressed(); // Invalid movie
+////                return;
+////            }
+////
+////            mSelectedMovieUri = intent.getData();
+////        } else {
+////            mSelectedMovieUri = savedInstanceState.getParcelable(SELECTED_MOVIE_URI_KEY);
+////        }
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,6 +97,17 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderManag
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
         getActivity().setTitle("");
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mSelectedMovieUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
+        }
+
+        if (mSelectedMovieUri == null) {
+            getActivity().onBackPressed(); // Invalid movie
+            return null;
+        }
+
         return rootView;
     }
 
@@ -126,11 +137,11 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderManag
         );
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(SELECTED_MOVIE_URI_KEY, mSelectedMovieUri);
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+////        outState.putParcelable(SELECTED_MOVIE_URI_KEY, mSelectedMovieUri);
+//        super.onSaveInstanceState(outState);
+//    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

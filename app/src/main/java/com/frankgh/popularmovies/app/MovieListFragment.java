@@ -1,7 +1,7 @@
 package com.frankgh.popularmovies.app;
 
-import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -19,6 +19,7 @@ import android.widget.GridView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.data.MoviesContract;
+import com.frankgh.popularmovies.sync.MoviesSyncAdapter;
 import com.frankgh.popularmovies.themoviedb.api.TheMovieDbService;
 import com.frankgh.popularmovies.util.Utility;
 
@@ -69,12 +70,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true); // Handle menu events
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            // The gridView probably hasn't even been populated yet.
-            // Actually perform the swapOut in onLoadFinished.
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-        }
     }
 
     @Override
@@ -91,17 +86,22 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-
                 if (cursor != null) {
-                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-                            .setData(MoviesContract.MovieEntry.buildMovieUri(cursor.getLong(MovieListFragment.COL_MOVIE_ID)));
-                    startActivity(intent);
+                    Uri movieDetailUri = MoviesContract.MovieEntry.buildMovieUri(cursor.getLong(MovieListFragment.COL_MOVIE_ID));
+                    ((Callback) getActivity())
+                            .onMovieSelected(movieDetailUri);
                 }
                 mPosition = position;
             }
         });
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The gridView probably hasn't even been populated yet.
+            // Actually perform the swapOut in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
         return rootView;
     }
@@ -169,13 +169,9 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
         ButterKnife.unbind(this);
     }
 
-    void onSortOrderChanged() {
-        updateMovies();
-    }
-
     private void updateMovies() {
         mSwipeRefreshLayout.setRefreshing(true);
-        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+        MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -195,10 +191,25 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             // If we don't need to restart the loader, and there's a
             // desired position to restore to, do so now.
             mGridView.smoothScrollToPosition(mPosition);
+            //mGridView.setSelection(mPosition);
         }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
         mMovieAdapter.swapCursor(null);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         *
+         * @param movieUri the movie URI
+         */
+        void onMovieSelected(Uri movieUri);
     }
 }

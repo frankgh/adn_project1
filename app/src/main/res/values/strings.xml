@@ -14,4 +14,8 @@
     <string name="title_activity_movie_detail">Movie Detail</string>
 
     <string name="format_vote_average"><xliff:g id="voteAvg">%1.1f</xliff:g></string>
+
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">popularmovies.frankgh.com</string>
+    <string name="content_authority">com.frankgh.popularmovies.app</string>
 </resources>

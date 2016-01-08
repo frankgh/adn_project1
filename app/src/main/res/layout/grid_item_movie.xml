@@ -18,10 +18,11 @@
         android:layout_gravity="center_horizontal|bottom"
         android:contentDescription="@string/grid_item_movie_poster_image"
         android:gravity="center_vertical"
-        android:visibility="invisible"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="invisible">
 
         <TextView
+            android:fontFamily="sans-serif-condensed"
             android:id="@+id/grid_item_movie_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
