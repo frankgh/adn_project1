@@ -6,9 +6,16 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import com.frankgh.popularmovies.themoviedb.model.Movie;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Francisco Guerrero <email>me@frankgh.com</email> on 12/21/15.
@@ -19,7 +26,43 @@ public class MoviesProvider extends ContentProvider {
     static final int MOVIE_WITH_ID = 105;
     static final int MOVIE_EXTRA = 200;
     static final int MOVIE_EXTRA_WITH_MOVIE_ID = 205;
+    static final int DISPLAYED_MOVIE = 300;
+    static final int SAVED_MOVIE = 400;
+
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final SQLiteQueryBuilder sDisplayedMoviesQueryBuilder;
+    private static final SQLiteQueryBuilder sSavedMoviesQueryBuilder;
+
+    static {
+        sDisplayedMoviesQueryBuilder = new SQLiteQueryBuilder();
+        sSavedMoviesQueryBuilder = new SQLiteQueryBuilder();
+
+        String joinString = "%s INNER JOIN %s ON %s.%s = %s.%s";
+
+        //This is an inner join which looks like
+        //displayed_movie INNER JOIN movie ON displayed_movie.movie_id = movie._id
+        String displayedMoviesJoinString = String.format(joinString,
+                MoviesContract.DisplayedMovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.DisplayedMovieEntry.TABLE_NAME,
+                MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry._ID);
+
+        //This is an inner join which looks like
+        //saved_movie INNER JOIN movie ON saved_movie.movie_id = movie._id
+        String savedMoviesJoinString = String.format(joinString,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry._ID);
+
+        sDisplayedMoviesQueryBuilder.setTables(displayedMoviesJoinString);
+        sSavedMoviesQueryBuilder.setTables(savedMoviesJoinString);
+    }
+
     private MoviesDbHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
@@ -38,6 +81,9 @@ public class MoviesProvider extends ContentProvider {
 
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_EXTRA, MOVIE_EXTRA);
         matcher.addURI(authority, MoviesContract.PATH_MOVIE_EXTRA + "/#", MOVIE_EXTRA_WITH_MOVIE_ID);
+
+        matcher.addURI(authority, MoviesContract.PATH_SAVED_MOVIE, SAVED_MOVIE);
+        matcher.addURI(authority, MoviesContract.PATH_DISPLAYED_MOVIE, DISPLAYED_MOVIE);
 
         return matcher;
     }
@@ -138,11 +184,31 @@ public class MoviesProvider extends ContentProvider {
                 final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
                 db.beginTransaction();
                 int returnCount = 0;
+                List<Integer> ids = getListOfMovieIds(values);
+                List<Movie> existingMovieList = getExistingMoviesByIds(db, ids);
+
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
+                        int movieId = value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
+                        Movie existingMovie = getMovieById(existingMovieList, movieId);
+
+                        if (existingMovie == null) {
+                            long _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, value);
+                            if (_id != -1) {
+                                returnCount++;
+                            }
+                        } else if (existingMovie.hasUpdates(value)) {
+                            value.put(MoviesContract.MovieEntry._ID, movieId);
+
+                            int rowsUpdated = db.update(
+                                    MoviesContract.MovieEntry.TABLE_NAME,
+                                    value,
+                                    MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                                    new String[]{Integer.toString(movieId)});
+
+                            if (rowsUpdated > 0) {
+                                returnCount++;
+                            }
                         }
                     }
                     db.setTransactionSuccessful();
@@ -177,6 +243,64 @@ public class MoviesProvider extends ContentProvider {
         }
     }
 
+    private Movie getMovieById(List<Movie> movieList, int movieId) {
+        if (movieList != null && !movieList.isEmpty()) {
+            for (Movie movie : movieList) {
+                if (movie.getMovieId() == movieId) {
+                    return movie;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<Movie> getExistingMoviesByIds(SQLiteDatabase db, List<Integer> ids) {
+        String selection = MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " IN (?)";
+        String[] selectionArgs = {TextUtils.join(",", ids)};
+        String[] columns = {
+                MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
+                MoviesContract.MovieEntry.COLUMN_ADULT,
+                MoviesContract.MovieEntry.COLUMN_GENRE_IDS,
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
+                MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE,
+                MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+                MoviesContract.MovieEntry.COLUMN_OVERVIEW,
+                MoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
+                MoviesContract.MovieEntry.COLUMN_POSTER_PATH,
+                MoviesContract.MovieEntry.COLUMN_POPULARITY,
+                MoviesContract.MovieEntry.COLUMN_TITLE,
+                MoviesContract.MovieEntry.COLUMN_VIDEO,
+                MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+                MoviesContract.MovieEntry.COLUMN_VOTE_COUNT,
+                MoviesContract.MovieEntry._ID
+        };
+
+        // Get existing movies by id
+        Cursor cursor = db.query(MoviesContract.MovieEntry.TABLE_NAME, columns,
+                selection, selectionArgs, null, null, null);
+        List<Movie> movieList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            movieList.add(new Movie(
+                    cursor.getString(0),
+                    cursor.getInt(1) != 0,
+                    cursor.getString(2),
+                    cursor.getInt(3),
+                    cursor.getString(4),
+                    cursor.getString(5),
+                    cursor.getString(6),
+                    cursor.getString(7),
+                    cursor.getString(8),
+                    cursor.getDouble(9),
+                    cursor.getString(10),
+                    cursor.getInt(11) != 0,
+                    cursor.getDouble(12),
+                    cursor.getInt(13),
+                    cursor.getInt(14)
+            ));
+        }
+        return movieList;
+    }
+
     @Override
     @TargetApi(11)
     public void shutdown() {
@@ -196,8 +320,24 @@ public class MoviesProvider extends ContentProvider {
                 return MoviesContract.MovieExtraEntry.TABLE_NAME;
             case MOVIE_EXTRA_WITH_MOVIE_ID:
                 return MoviesContract.MovieExtraEntry.TABLE_NAME;
+            case SAVED_MOVIE:
+                return MoviesContract.SavedMovieEntry.TABLE_NAME;
+            case DISPLAYED_MOVIE:
+                return MoviesContract.DisplayedMovieEntry.TABLE_NAME;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+    }
+
+    private List<Integer> getListOfMovieIds(ContentValues[] values) {
+        if (values == null || values.length == 0) {
+            return null;
+        }
+
+        List<Integer> ids = new ArrayList<>(values.length);
+        for (ContentValues value : values) {
+            ids.add(value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID));
+        }
+        return ids;
     }
 }

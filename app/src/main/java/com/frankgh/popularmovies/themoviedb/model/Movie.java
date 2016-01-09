@@ -1,17 +1,22 @@
 package com.frankgh.popularmovies.themoviedb.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
+import com.frankgh.popularmovies.data.MoviesContract;
 import com.frankgh.popularmovies.util.AndroidUtil;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * An object representing a Movie
- *
+ * <p/>
  * Created by francisco on 11/25/15.
  */
 public class Movie implements Parcelable {
@@ -29,12 +34,14 @@ public class Movie implements Parcelable {
 
     private final String LOG_TAG = Movie.class.getSimpleName();
 
+    private Integer internalId;
     @SerializedName("backdrop_path")
     private String backdropPath;
     private Boolean adult;
     @SerializedName("genre_ids")
     private List<Integer> genreIds = new ArrayList<>();
-    private Integer id;
+    @SerializedName("id")
+    private Integer movieId;
     @SerializedName("original_language")
     private String originalLanguage;
     @SerializedName("original_title")
@@ -56,7 +63,7 @@ public class Movie implements Parcelable {
         backdropPath = AndroidUtil.readStringFromParcel(in);
         adult = AndroidUtil.readBooleanFromParcel(in);
         genreIds = AndroidUtil.readIntegerListFromParcel(in);
-        id = AndroidUtil.readIntegerFromParcel(in);
+        movieId = AndroidUtil.readIntegerFromParcel(in);
         originalLanguage = AndroidUtil.readStringFromParcel(in);
         originalTitle = AndroidUtil.readStringFromParcel(in);
         overview = AndroidUtil.readStringFromParcel(in);
@@ -69,16 +76,39 @@ public class Movie implements Parcelable {
         voteCount = AndroidUtil.readIntegerFromParcel(in);
     }
 
-    public Movie(int id, String title, double voteAverage, String backdropPath,
-                 String posterPath, String releaseDate, String overview) {
-        this.id = id;
-        this.title = title;
-        this.voteAverage = voteAverage;
+    public Movie(String backdropPath, boolean adult, String genreIds, int movieId,
+                 String originalLanguage, String originalTitle, String overview,
+                 String releaseDate, String posterPath, double popularity,
+                 String title, boolean video, double voteAverage, int voteCount, int internalId) {
         this.backdropPath = backdropPath;
-        this.posterPath = posterPath;
-        this.releaseDate = releaseDate;
+        this.adult = adult;
+        this.genreIds = new Gson()
+                .fromJson(genreIds, new TypeToken<List<String>>() {
+                }.getType());
+        this.movieId = movieId;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
         this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
+        this.popularity = popularity;
+        this.title = title;
+        this.video = video;
+        this.voteAverage = voteAverage;
+        this.voteCount = voteCount;
+        this.internalId = internalId;
     }
+
+//    public Movie(int movieId, String title, double voteAverage, String backdropPath,
+//                 String posterPath, String releaseDate, String overview) {
+//        this.movieId = movieId;
+//        this.title = title;
+//        this.voteAverage = voteAverage;
+//        this.backdropPath = backdropPath;
+//        this.posterPath = posterPath;
+//        this.releaseDate = releaseDate;
+//        this.overview = overview;
+//    }
 
     public Boolean getAdult() {
         return adult;
@@ -92,8 +122,8 @@ public class Movie implements Parcelable {
         return genreIds;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getMovieId() {
+        return movieId;
     }
 
     public String getOriginalLanguage() {
@@ -140,7 +170,7 @@ public class Movie implements Parcelable {
         AndroidUtil.writeToParcel(backdropPath, out);
         AndroidUtil.writeToParcel(adult, out);
         AndroidUtil.writeToParcel(genreIds, out);
-        AndroidUtil.writeToParcel(id, out);
+        AndroidUtil.writeToParcel(movieId, out);
         AndroidUtil.writeToParcel(originalLanguage, out);
         AndroidUtil.writeToParcel(originalTitle, out);
         AndroidUtil.writeToParcel(overview, out);
@@ -156,5 +186,22 @@ public class Movie implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    public boolean hasUpdates(ContentValues value) {
+        return !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH), getBackdropPath()) ||
+                value.getAsBoolean(MoviesContract.MovieEntry.COLUMN_ADULT) != getAdult() ||
+                //!TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_GENRE_IDS), movie.getGenreIds()) ||
+                value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID) != getMovieId() ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE), getOriginalLanguage()) ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE), getOriginalTitle()) ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_OVERVIEW), getOverview()) ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE), getReleaseDate()) ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_POSTER_PATH), getPosterPath()) ||
+                value.getAsDouble(MoviesContract.MovieEntry.COLUMN_POPULARITY) != getPopularity() ||
+                !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_TITLE), getTitle()) ||
+                value.getAsBoolean(MoviesContract.MovieEntry.COLUMN_VIDEO) != getVideo() ||
+                value.getAsDouble(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE) != getVoteAverage() ||
+                value.getAsInteger(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT) != getVoteCount();
     }
 }

@@ -41,23 +41,52 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_MOVIE_EXTRA_TABLE =
                 "CREATE TABLE " + MoviesContract.MovieExtraEntry.TABLE_NAME + " (" +
                         MoviesContract.MovieExtraEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        // the ID of the account entry associated with this movie data
+                        // the ID of the movie entry associated with this movie data
                         MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
                         MoviesContract.MovieExtraEntry.COLUMN_EXTRA_NAME + " TEXT NOT NULL, " +
                         MoviesContract.MovieExtraEntry.COLUMN_EXTRA_VALUE + " TEXT NOT NULL, " +
                         MoviesContract.MovieExtraEntry.COLUMN_ADDED_DATE + " TEXT NOT NULL, " +
 
-                        // Set up the account column as a foreign key to account table.
+                        // Set up the movie column as a foreign key to account table.
                         " FOREIGN KEY (" + MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
+                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
+                        " );";
+
+        // Create a table to hold the saved movies
+        final String SQL_CREATE_SAVED_MOVIE_TABLE =
+                "CREATE TABLE " + MoviesContract.SavedMovieEntry.TABLE_NAME + " (" +
+                        MoviesContract.SavedMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        // the ID of the movie entry associated with this movie data
+                        MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL UNIQUE," +
+                        MoviesContract.SavedMovieEntry.COLUMN_IS_SAVED + " INTEGER NOT NULL," +
+                        MoviesContract.SavedMovieEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
+                        MoviesContract.SavedMovieEntry.COLUMN_UPDATED_DATE + " INTEGER NOT NULL," +
+
+                        // Set up the movie column as a foreign key to movie table.
+                        " FOREIGN KEY (" + MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
+                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
+                        " );";
+
+        // Create a table to hold a list of movies displayed in Main Activity
+        final String SQL_CREATE_DISPLAYED_MOVIE_TABLE =
+                "CREATE TABLE " + MoviesContract.DisplayedMovieEntry.TABLE_NAME + " (" +
+                        MoviesContract.DisplayedMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        // the ID of the movie entry associated with this movie data
+                        MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL UNIQUE," +
+                        MoviesContract.DisplayedMovieEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
+
+                        // Set up the movie column as a foreign key to movie table.
+                        " FOREIGN KEY (" + MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
                         MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
                         " );";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
         db.execSQL(SQL_CREATE_MOVIE_EXTRA_TABLE);
+        db.execSQL(SQL_CREATE_SAVED_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_DISPLAYED_MOVIE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 }

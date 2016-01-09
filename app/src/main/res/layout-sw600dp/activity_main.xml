@@ -10,7 +10,7 @@
     <include layout="@layout/main_toolbar" />
 
     <fragment
-        android:id="@+id/fragment_main"
+        android:movieId="@+movieId/fragment_main"
         class="com.frankgh.popularmovies.app.MovieListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -19,7 +19,7 @@
         tools:layout="@layout/fragment_movie_list" />
 
     <FrameLayout
-        android:id="@+id/fragment_movie_detail"
+        android:movieId="@+movieId/fragment_movie_detail"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="4" />

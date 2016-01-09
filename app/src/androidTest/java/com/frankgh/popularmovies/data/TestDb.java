@@ -34,6 +34,8 @@ public class TestDb extends AndroidTestCase {
         final HashSet<String> tableNameHashSet = new HashSet<>();
         tableNameHashSet.add(MoviesContract.MovieEntry.TABLE_NAME);
         tableNameHashSet.add(MoviesContract.MovieExtraEntry.TABLE_NAME);
+        tableNameHashSet.add(MoviesContract.SavedMovieEntry.TABLE_NAME);
+        tableNameHashSet.add(MoviesContract.DisplayedMovieEntry.TABLE_NAME);
 
         deleteTheDatabase();
         SQLiteDatabase db = new MoviesDbHelper(this.mContext).getWritableDatabase();
@@ -78,14 +80,30 @@ public class TestDb extends AndroidTestCase {
 
         validateColumnsInTable(db, MoviesContract.MovieEntry.TABLE_NAME, movieColumnHashSet);
 
-        final HashSet<String> accountColumnHashSet = new HashSet<>();
-        accountColumnHashSet.add(MoviesContract.MovieExtraEntry._ID);
-        accountColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY);
-        accountColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_EXTRA_NAME);
-        accountColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_EXTRA_VALUE);
-        accountColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_ADDED_DATE);
+        final HashSet<String> movieExtraColumnHashSet = new HashSet<>();
+        movieExtraColumnHashSet.add(MoviesContract.MovieExtraEntry._ID);
+        movieExtraColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY);
+        movieExtraColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_EXTRA_NAME);
+        movieExtraColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_EXTRA_VALUE);
+        movieExtraColumnHashSet.add(MoviesContract.MovieExtraEntry.COLUMN_ADDED_DATE);
 
-        validateColumnsInTable(db, MoviesContract.MovieExtraEntry.TABLE_NAME, accountColumnHashSet);
+        validateColumnsInTable(db, MoviesContract.MovieExtraEntry.TABLE_NAME, movieExtraColumnHashSet);
+
+        final HashSet<String> savedMovieColumnHashSet = new HashSet<>();
+        savedMovieColumnHashSet.add(MoviesContract.SavedMovieEntry._ID);
+        savedMovieColumnHashSet.add(MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY);
+        savedMovieColumnHashSet.add(MoviesContract.SavedMovieEntry.COLUMN_IS_SAVED);
+        savedMovieColumnHashSet.add(MoviesContract.SavedMovieEntry.COLUMN_DATE);
+        savedMovieColumnHashSet.add(MoviesContract.SavedMovieEntry.COLUMN_UPDATED_DATE);
+
+        validateColumnsInTable(db, MoviesContract.SavedMovieEntry.TABLE_NAME, savedMovieColumnHashSet);
+
+        final HashSet<String> displayedMovieColumnHashSet = new HashSet<>();
+        displayedMovieColumnHashSet.add(MoviesContract.DisplayedMovieEntry._ID);
+        displayedMovieColumnHashSet.add(MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY);
+        displayedMovieColumnHashSet.add(MoviesContract.DisplayedMovieEntry.COLUMN_DATE);
+
+        validateColumnsInTable(db, MoviesContract.DisplayedMovieEntry.TABLE_NAME, displayedMovieColumnHashSet);
 
         db.close();
     }

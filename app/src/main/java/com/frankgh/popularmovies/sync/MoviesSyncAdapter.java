@@ -168,7 +168,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             movieValues.put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movieList.get(i).getBackdropPath());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_ADULT, movieList.get(i).getAdult());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_GENRE_IDS, gson.toJson(movieList.get(i).getGenreIds()));
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieList.get(i).getId());
+            movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieList.get(i).getMovieId());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movieList.get(i).getOriginalLanguage());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movieList.get(i).getOriginalTitle());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movieList.get(i).getOverview());

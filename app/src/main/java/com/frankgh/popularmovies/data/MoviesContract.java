@@ -23,6 +23,62 @@ public class MoviesContract {
     // Possible paths (appended to base content URI for possible URI's)
     public static final String PATH_MOVIE = "movie";
     public static final String PATH_MOVIE_EXTRA = "movie_extra";
+    public static final String PATH_SAVED_MOVIE = "saved_movie";
+    public static final String PATH_DISPLAYED_MOVIE = "displayed_movie";
+
+    public static final class DisplayedMovieEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DISPLAYED_MOVIE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAYED_MOVIE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DISPLAYED_MOVIE;
+
+        // Table name
+        public static final String TABLE_NAME = "displayed_movie";
+
+        // Columns
+
+        // Movie ID as returned by API
+        public static final String COLUMN_MOVIE_KEY = "movie_id";
+        // Added date, stored as long in milliseconds since the epoch
+        public static final String COLUMN_DATE = "date";
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class SavedMovieEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SAVED_MOVIE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SAVED_MOVIE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SAVED_MOVIE;
+
+        // Table name
+        public static final String TABLE_NAME = "saved_movie";
+
+        // Columns
+
+        // Movie ID as returned by API
+        public static final String COLUMN_MOVIE_KEY = "movie_id";
+        // Is Saved set to true or false
+        public static final String COLUMN_IS_SAVED = "is_saved";
+        // Added date, stored as long in milliseconds since the epoch
+        public static final String COLUMN_DATE = "date";
+        // Updated date, stored as long in milliseconds since the epoch
+        public static final String COLUMN_UPDATED_DATE = "updated_date";
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
 
     public static final class MovieEntry implements BaseColumns {
 
