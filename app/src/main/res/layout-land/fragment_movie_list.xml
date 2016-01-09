@@ -6,12 +6,12 @@
     tools:context="com.frankgh.popularmovies.app.MovieListFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:movieId="@+movieId/pull_to_refresh"
+        android:id="@+id/pull_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <GridView
-            android:movieId="@+movieId/gridview_movies"
+            android:id="@+id/gridview_movies"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:numColumns="3" />

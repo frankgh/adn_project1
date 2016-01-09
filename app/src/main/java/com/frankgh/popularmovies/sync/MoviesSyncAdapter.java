@@ -162,6 +162,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
         Gson gson = new Gson();
         ContentValues[] movieContentValues = new ContentValues[movieList.size()];
+        ContentValues[] displayedMovieContentValues = new ContentValues[movieList.size()];
 
         for (int i = 0; i < movieList.size(); i++) {
             ContentValues movieValues = new ContentValues();
@@ -180,13 +181,19 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieList.get(i).getVoteAverage());
             movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movieList.get(i).getVoteCount());
             movieContentValues[i] = movieValues;
+
+            ContentValues displayedValues = new ContentValues();
+            displayedValues.put(MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY, movieList.get(i).getMovieId());
+            displayedValues.put(MoviesContract.DisplayedMovieEntry.COLUMN_DATE, System.currentTimeMillis());
+            displayedMovieContentValues[i] = displayedValues;
         }
 
         ContentResolver resolver = getContext().getContentResolver();
 
         if (resolver != null) {
-            resolver.delete(MoviesContract.MovieEntry.CONTENT_URI, null, null);
+            resolver.delete(MoviesContract.DisplayedMovieEntry.CONTENT_URI, null, null);
             resolver.bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, movieContentValues);
+            resolver.bulkInsert(MoviesContract.DisplayedMovieEntry.CONTENT_URI, displayedMovieContentValues);
             Log.d(LOG_TAG, "Sync Complete. " + movieContentValues.length + " Movies Inserted");
         }
     }
