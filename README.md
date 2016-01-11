@@ -21,3 +21,7 @@ Based some of the layouts on mladenbabic's layouts for the Popular Movies projec
 * Picasso
 * OkHttp
 * Retrofit
+
+## API
+
+* The Movie DB API
