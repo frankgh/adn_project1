@@ -3,6 +3,7 @@ package com.frankgh.popularmovies.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -29,7 +30,23 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setIcon(R.drawable.ic_movie_placeholder);
+
+        ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+//            actionBar.setIcon(R.drawable.ic_logo);
+//            //actionBar.setDisplayShowHomeEnabled(false);
+//            actionBar.setHomeButtonEnabled(false);
+//            actionBar.setDisplayShowTitleEnabled(false);
+//            actionBar.setDisplayUseLogoEnabled(false);
+//            actionBar.setDisplayHomeAsUpEnabled(false);
+
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(R.drawable.ic_logo); //also displays wide logo
+            actionBar.setDisplayShowTitleEnabled(false); //optional
+
+        }
 
         mTwoPane = findViewById(R.id.fragment_movie_detail) != null;
 

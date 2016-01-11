@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.frankgh.popularmovies.themoviedb.model.Movie;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,6 +30,8 @@ public class MoviesProvider extends ContentProvider {
     static final int MOVIE_EXTRA_WITH_MOVIE_ID = 205;
     static final int DISPLAYED_MOVIE = 300;
     static final int SAVED_MOVIE = 400;
+
+    public final String LOG_TAG = MoviesProvider.class.getSimpleName();
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sDisplayedMoviesQueryBuilder;
@@ -47,7 +51,7 @@ public class MoviesProvider extends ContentProvider {
                 MoviesContract.DisplayedMovieEntry.TABLE_NAME,
                 MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY,
                 MoviesContract.MovieEntry.TABLE_NAME,
-                MoviesContract.MovieEntry._ID);
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
 
         //This is an inner join which looks like
         //saved_movie INNER JOIN movie ON saved_movie.movie_id = movie._id
@@ -57,7 +61,7 @@ public class MoviesProvider extends ContentProvider {
                 MoviesContract.SavedMovieEntry.TABLE_NAME,
                 MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY,
                 MoviesContract.MovieEntry.TABLE_NAME,
-                MoviesContract.MovieEntry._ID);
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
 
         sDisplayedMoviesQueryBuilder.setTables(displayedMoviesJoinString);
         sSavedMoviesQueryBuilder.setTables(savedMoviesJoinString);
@@ -99,15 +103,30 @@ public class MoviesProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
-        Cursor retCursor = mOpenHelper.getReadableDatabase().query(
-                getTableName(uri),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
+        Cursor retCursor = null;
+
+        final int match = sUriMatcher.match(uri);
+
+        if (match == DISPLAYED_MOVIE) {
+            retCursor = sDisplayedMoviesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+            );
+        } else {
+            retCursor = mOpenHelper.getReadableDatabase().query(
+                    getTableName(uri),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+            );
+        }
 
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
@@ -180,13 +199,13 @@ public class MoviesProvider extends ContentProvider {
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
+
             case MOVIE: {
                 final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
                 db.beginTransaction();
                 int returnCount = 0;
                 List<Integer> ids = getListOfMovieIds(values);
                 List<Movie> existingMovieList = getExistingMoviesByIds(db, ids);
-
                 try {
                     for (ContentValues value : values) {
                         int movieId = value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
@@ -198,7 +217,8 @@ public class MoviesProvider extends ContentProvider {
                                 returnCount++;
                             }
                         } else if (existingMovie.hasUpdates(value)) {
-                            value.put(MoviesContract.MovieEntry._ID, movieId);
+                            value.put(MoviesContract.MovieEntry._ID, existingMovie.getInternalId());
+                            value.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
 
                             int rowsUpdated = db.update(
                                     MoviesContract.MovieEntry.TABLE_NAME,
@@ -206,9 +226,32 @@ public class MoviesProvider extends ContentProvider {
                                     MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
                                     new String[]{Integer.toString(movieId)});
 
+                            Log.d(LOG_TAG, "Movie with id " + movieId + " was updated");
+
                             if (rowsUpdated > 0) {
                                 returnCount++;
                             }
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (returnCount > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return returnCount;
+            }
+
+            case DISPLAYED_MOVIE: {
+                final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MoviesContract.DisplayedMovieEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
                         }
                     }
                     db.setTransactionSuccessful();
@@ -254,9 +297,10 @@ public class MoviesProvider extends ContentProvider {
         return null;
     }
 
-    private List<Movie> getExistingMoviesByIds(SQLiteDatabase db, List<Integer> ids) {
-        String selection = MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " IN (?)";
-        String[] selectionArgs = {TextUtils.join(",", ids)};
+    private List<Movie> getExistingMoviesByIds(final SQLiteDatabase db, List<Integer> ids) {
+        String selection = MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " IN (" +
+                TextUtils.join(",", Collections.nCopies(ids.size(), "?")) + ")";
+        String[] selectionArgs = TextUtils.join(",", ids).split(",");
         String[] columns = {
                 MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
                 MoviesContract.MovieEntry.COLUMN_ADULT,
@@ -277,6 +321,7 @@ public class MoviesProvider extends ContentProvider {
 
         // Get existing movies by id
         Cursor cursor = db.query(MoviesContract.MovieEntry.TABLE_NAME, columns,
+                //        null, null, null, null, null);
                 selection, selectionArgs, null, null, null);
         List<Movie> movieList = new ArrayList<>();
         while (cursor.moveToNext()) {
@@ -298,6 +343,7 @@ public class MoviesProvider extends ContentProvider {
                     cursor.getInt(14)
             ));
         }
+        cursor.close();
         return movieList;
     }
 

@@ -166,6 +166,10 @@ public class Movie implements Parcelable {
         return voteCount;
     }
 
+    public Integer getInternalId() {
+        return internalId;
+    }
+
     public void writeToParcel(Parcel out, int flags) {
         AndroidUtil.writeToParcel(backdropPath, out);
         AndroidUtil.writeToParcel(adult, out);
@@ -192,16 +196,16 @@ public class Movie implements Parcelable {
         return !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH), getBackdropPath()) ||
                 value.getAsBoolean(MoviesContract.MovieEntry.COLUMN_ADULT) != getAdult() ||
                 //!TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_GENRE_IDS), movie.getGenreIds()) ||
-                value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID) != getMovieId() ||
+                !movieId.equals(value.getAsInteger(MoviesContract.MovieEntry.COLUMN_MOVIE_ID)) ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE), getOriginalLanguage()) ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE), getOriginalTitle()) ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_OVERVIEW), getOverview()) ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE), getReleaseDate()) ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_POSTER_PATH), getPosterPath()) ||
-                value.getAsDouble(MoviesContract.MovieEntry.COLUMN_POPULARITY) != getPopularity() ||
+                Double.compare(value.getAsDouble(MoviesContract.MovieEntry.COLUMN_POPULARITY), getPopularity()) != 0 ||
                 !TextUtils.equals(value.getAsString(MoviesContract.MovieEntry.COLUMN_TITLE), getTitle()) ||
                 value.getAsBoolean(MoviesContract.MovieEntry.COLUMN_VIDEO) != getVideo() ||
-                value.getAsDouble(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE) != getVoteAverage() ||
-                value.getAsInteger(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT) != getVoteCount();
+                Double.compare(value.getAsDouble(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE), getVoteAverage()) != 0 ||
+                !voteCount.equals(value.getAsInteger(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT));
     }
 }

@@ -31,7 +31,7 @@ import retrofit.Response;
 public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Interval at which to sync with the weather, in milliseconds.
-    // 60 seconds (1 minute) * 60 (seconds) * 24 hours * 7 days = 1 week
+    // 60 seconds (1 minute) * 60 (1 hour) * 24 hours * 7 days = 1 week
     public static final int SYNC_INTERVAL = 60 * 60 * 24 * 7;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 2;
 

@@ -97,7 +97,7 @@ public class MoviesContract {
         public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
         public static final String COLUMN_ADULT = "adult";
         public static final String COLUMN_GENRE_IDS = "genre_ids";
-        public static final String COLUMN_MOVIE_ID = "id";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ORIGINAL_LANGUAGE = "original_language";
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";
         public static final String COLUMN_OVERVIEW = "overview";

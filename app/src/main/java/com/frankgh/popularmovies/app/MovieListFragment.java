@@ -36,15 +36,25 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
     // must change.
-    static final int COL_MOVIE_ID = 0;
-    static final int COL_MOVIE_TITLE = 1;
-    static final int COL_MOVIE_VOTE_AVERAGE = 2;
-    static final int COL_MOVIE_POSTER_PATH = 3;
+    static final int COL_DISPLAYED_MOVIE_ID = 0;
+    static final int COL_MOVIE_ID = 1;
+    static final int COL_MOVIE_TITLE = 2;
+    static final int COL_MOVIE_VOTE_AVERAGE = 3;
+    static final int COL_MOVIE_POSTER_PATH = 4;
 
     private static final int MOVIE_LOADER = 0;
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] MOVIE_COLUMNS = {
+            MoviesContract.DisplayedMovieEntry.TABLE_NAME + "." + MoviesContract.DisplayedMovieEntry._ID,
+            MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
+            MoviesContract.MovieEntry.COLUMN_TITLE,
+            MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MoviesContract.MovieEntry.COLUMN_POSTER_PATH
+    };
+
+    private  static final String [] FAVORITE_MOVIE_COLUMNS = {
+            MoviesContract.SavedMovieEntry.TABLE_NAME + "." + MoviesContract.SavedMovieEntry._ID,
             MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
             MoviesContract.MovieEntry.COLUMN_TITLE,
             MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
@@ -145,6 +155,11 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 sortBy = TheMovieDbService.SORT_BY_RELEASE_DATE;
                 sortOrder = TheMovieDbService.SORT_ORDER_DESC;
                 break;
+
+            case R.id.action_favorites:
+                sortBy = getString(R.string.action_favorites);
+                sortOrder = "";
+                break;
         }
 
         if (!TextUtils.isEmpty(sortBy) && !TextUtils.isEmpty(sortOrder)) {
@@ -175,8 +190,12 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        //String preference = Utility.getSortingPreference(getActivity());
+
+        //if ()
         return new CursorLoader(getActivity(),
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MoviesContract.DisplayedMovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
                 null,
                 null,

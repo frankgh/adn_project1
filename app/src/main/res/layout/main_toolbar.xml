@@ -12,7 +12,7 @@
         android:background="?attr/colorPrimary"
         android:fontFamily="sans-serif-light"
         android:textStyle="italic"
-        app:layout_scrollFlags="scroll|enterAlways"
+        app:layout_scrollFlags="snap|enterAlways"
         app:popupTheme="@style/AppTheme.PopupOverlay" />
 
 </android.support.design.widget.AppBarLayout>

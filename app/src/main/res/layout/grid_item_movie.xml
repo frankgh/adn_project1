@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/grid_item_movie_pill_item_margin"
-            android:layout_marginRight="@dimen/grid_item_movie_pill_item_margin"
+            android:layout_marginRight="@dimen/grid_item_movie_pill_item_margin_right"
             android:layout_weight="1"
             android:maxLines="2"
             android:singleLine="false"

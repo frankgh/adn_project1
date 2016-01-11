@@ -69,7 +69,6 @@ public class MovieAdapter extends CursorAdapter {
                     .into(viewHolder.posterImageView, new Callback() {
                         @Override
                         public void onSuccess() {
-                            viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
                             setPillPalette(viewHolder);
                         }
 
@@ -83,7 +82,6 @@ public class MovieAdapter extends CursorAdapter {
                                     .into(viewHolder.posterImageView, new Callback() {
                                         @Override
                                         public void onSuccess() {
-                                            viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
                                             setPillPalette(viewHolder);
                                         }
 
@@ -116,6 +114,8 @@ public class MovieAdapter extends CursorAdapter {
                     holder.moviePillView.setBackgroundColor(ColorUtils
                             .setAlphaComponent(palette.getMutedColor(vibrant.getRgb()), 220));
                     holder.moviePillView.setVisibility(View.VISIBLE);
+                    holder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    holder.posterImageView.setPadding(0, 0, 0, 0);
                 }
             }
         });

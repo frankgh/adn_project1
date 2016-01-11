@@ -103,10 +103,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             mSelectedMovieUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
         }
 
-        if (mSelectedMovieUri == null) {
-            getActivity().onBackPressed(); // Invalid movie
-            return null;
-        }
+
 
         return rootView;
     }

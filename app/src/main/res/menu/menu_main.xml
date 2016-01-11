@@ -17,4 +17,9 @@
         android:orderInCategory="115"
         android:title="@string/action_recent_releases"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_favorites"
+        android:orderInCategory="120"
+        android:title="@string/action_favorites"
+        app:showAsAction="never" />
 </menu>
