@@ -31,6 +31,7 @@ public class Global extends Application {
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttpDownloader(this, Integer.MAX_VALUE))
                 .build();
+        // Enable the following two lines for debugging
         //picasso.setIndicatorsEnabled(true);
         //picasso.setLoggingEnabled(true);
         Picasso.setSingletonInstance(picasso);
