@@ -10,9 +10,9 @@ To setup the "TheMovieDB" API Key *app/build.gradle*, and change the following l
 
 with a valid API_KEY for the **The Movie DB** API Service.
 
-## References
+## API
 
-Based some of the layouts on mladenbabic's layouts for the Popular Movies project
+* The Movie DB API
 
 ## Third Party Libraries
 
@@ -21,7 +21,3 @@ Based some of the layouts on mladenbabic's layouts for the Popular Movies projec
 * Picasso
 * OkHttp
 * Retrofit
-
-## API
-
-* The Movie DB API
