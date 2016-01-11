@@ -49,7 +49,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
                         // Set up the movie column as a foreign key to account table.
                         " FOREIGN KEY (" + MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
+                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry.COLUMN_MOVIE_ID + ")" +
                         " );";
 
         // Create a table to hold the saved movies
@@ -64,7 +64,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
                         // Set up the movie column as a foreign key to movie table.
                         " FOREIGN KEY (" + MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
+                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry.COLUMN_MOVIE_ID + ")" +
                         " );";
 
         // Create a table to hold a list of movies displayed in Main Activity
@@ -77,7 +77,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
                         // Set up the movie column as a foreign key to movie table.
                         " FOREIGN KEY (" + MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry._ID + ")" +
+                        MoviesContract.MovieEntry.TABLE_NAME + " (" + MoviesContract.MovieEntry.COLUMN_MOVIE_ID + ")" +
                         " );";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);

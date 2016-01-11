@@ -75,8 +75,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     public void onMovieSelected(Uri movieUri) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
+            // adding or replacing the detail fragment using a fragment transaction.
             Bundle args = new Bundle();
             args.putParcelable(MovieDetailFragment.DETAIL_URI, movieUri);
 

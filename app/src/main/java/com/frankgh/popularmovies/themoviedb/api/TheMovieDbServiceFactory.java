@@ -28,6 +28,7 @@ public class TheMovieDbServiceFactory {
 
             @Override
             public Response intercept(Chain chain) throws IOException {
+                // Inject API Key
                 HttpUrl url = chain.request().httpUrl()
                         .newBuilder()
                         .addQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)

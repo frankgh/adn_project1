@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
 /**
  * @author Francisco Guerrero <email>me@frankgh.com</email> on 12/21/15.
@@ -112,6 +113,10 @@ public class MoviesContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static long getIdFromUri(@NonNull Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
     }
 
     public static final class MovieExtraEntry implements BaseColumns {
@@ -138,6 +143,10 @@ public class MoviesContract {
 
         public static Uri buildMovieExtraUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static long getMovieIdFromUri(@NonNull Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
         }
     }
 }

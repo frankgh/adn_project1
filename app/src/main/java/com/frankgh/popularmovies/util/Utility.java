@@ -102,8 +102,6 @@ public class Utility {
         if (voteAverage != null) {
             try {
                 return context.getString(R.string.format_vote_average, voteAverage);
-//                NumberFormat voteAvgFormatter = new DecimalFormat("#0.0");
-//                return voteAvgFormatter.format(voteAverage);
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Unable to parse decimal number '" + voteAverage + "'", e);
             }

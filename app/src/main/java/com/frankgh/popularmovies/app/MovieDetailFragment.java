@@ -1,10 +1,12 @@
 package com.frankgh.popularmovies.app;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -21,6 +23,8 @@ import com.frankgh.popularmovies.util.Utility;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -39,9 +43,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     static final int COL_MOVIE_POSTER_PATH = 4;
     static final int COL_MOVIE_RELEASE_DATE = 5;
     static final int COL_MOVIE_OVERVIEW = 6;
+    static final int COL_SAVED_MOVIE_ID = 7;
 
     static final String DETAIL_URI = "URI";
     private static final int MOVIE_DETAIL_LOADER = 0;
+    private static final int MOVIE_EXTRA_LOADER = 10;
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] MOVIE_DETAIL_COLUMNS = {
@@ -51,10 +57,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
             MoviesContract.MovieEntry.COLUMN_POSTER_PATH,
             MoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
-            MoviesContract.MovieEntry.COLUMN_OVERVIEW
+            MoviesContract.MovieEntry.COLUMN_OVERVIEW,
+            MoviesContract.SavedMovieEntry.TABLE_NAME + "." + MoviesContract.SavedMovieEntry._ID
     };
 
-//    private static final String SELECTED_MOVIE_URI_KEY = "selected_movie_uri";
     private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
     @Bind(R.id.posterImageView)
@@ -73,23 +79,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     TextView mMovieOverviewTextView;
 
     private Uri mSelectedMovieUri;
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-////        if (savedInstanceState == null || !savedInstanceState.containsKey(SELECTED_MOVIE_URI_KEY)) {
-////            Intent intent = getActivity().getIntent();
-////            if (intent == null) {
-////                getActivity().onBackPressed(); // Invalid movie
-////                return;
-////            }
-////
-////            mSelectedMovieUri = intent.getData();
-////        } else {
-////            mSelectedMovieUri = savedInstanceState.getParcelable(SELECTED_MOVIE_URI_KEY);
-////        }
-//    }
+    private Integer mMovieId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,8 +92,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         if (arguments != null) {
             mSelectedMovieUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
         }
-
-
 
         return rootView;
     }
@@ -124,41 +112,78 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader()");
 
-        return new CursorLoader(
-                getActivity(),
-                mSelectedMovieUri,
-                MOVIE_DETAIL_COLUMNS,
-                null,
-                null,
-                null
-        );
-    }
+        switch (id) {
+            case MOVIE_DETAIL_LOADER:
+                if (mSelectedMovieUri != null) {
+                    return new CursorLoader(
+                            getActivity(),
+                            mSelectedMovieUri,
+                            MOVIE_DETAIL_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
+                break;
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-////        outState.putParcelable(SELECTED_MOVIE_URI_KEY, mSelectedMovieUri);
-//        super.onSaveInstanceState(outState);
-//    }
+            case MOVIE_EXTRA_LOADER:
+                return new CursorLoader(
+                        getActivity(),
+                        MoviesContract.MovieExtraEntry.buildMovieExtraUri(mMovieId),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        }
+        return null;
+    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished()");
 
+        switch (loader.getId()) {
+            case MOVIE_DETAIL_LOADER:
+                bindMovieDetail(loader, data);
+                break;
+
+            case MOVIE_EXTRA_LOADER:
+                bindMovieExtra(loader, data);
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    private void bindMovieDetail(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
             getActivity().onBackPressed(); // Invalid movie
             return;
         }
 
+        mMovieId = data.getInt(COL_MOVIE_ID);
         mMovieOverviewTextView.setText(data.getString(COL_MOVIE_OVERVIEW));
         mMovieReleaseDateTextView.setText(Utility.getFormattedReleaseDate(data.getString(COL_MOVIE_RELEASE_DATE)));
         mMovieVoteAverageTextView.setText(Utility.getFormattedVoteAverage(getActivity(), data.getDouble(COL_MOVIE_VOTE_AVERAGE)));
+
+        // Load movie extra data
+        getLoaderManager().initLoader(MOVIE_EXTRA_LOADER, null, this);
 
         bindImageToView(Utility.getPosterAbsolutePath(data.getString(COL_MOVIE_POSTER_PATH)), mPosterImageView);
         bindImageToView(Utility.getBackDropAbsolutePath(data.getString(COL_MOVIE_BACKDROP_PATH)), mBackdropImageView);
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    private void bindMovieExtra(Loader<Cursor> loader, Cursor data) {
+        if (!data.moveToFirst()) {
+            return; // no data available
+        }
+
+        //Gson gson = new Gson();
+
+
     }
 
     private void bindImageToView(final String path, final ImageView imageView) {
@@ -193,5 +218,21 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                                 });
                     }
                 });
+    }
+
+    private static class MovieExtraLoader extends AsyncTaskLoader<List<String>> {
+        public MovieExtraLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<String> loadInBackground() {
+            return null;
+        }
+
+        @Override
+        public void deliverResult(List<String> data) {
+            super.deliverResult(data);
+        }
     }
 }

@@ -31,17 +31,19 @@ public class MoviesProvider extends ContentProvider {
     static final int DISPLAYED_MOVIE = 300;
     static final int SAVED_MOVIE = 400;
 
-    public final String LOG_TAG = MoviesProvider.class.getSimpleName();
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sDisplayedMoviesQueryBuilder;
     private static final SQLiteQueryBuilder sSavedMoviesQueryBuilder;
+    private static final SQLiteQueryBuilder sMovieDetailQueryBuilder;
 
     static {
         sDisplayedMoviesQueryBuilder = new SQLiteQueryBuilder();
         sSavedMoviesQueryBuilder = new SQLiteQueryBuilder();
+        sMovieDetailQueryBuilder = new SQLiteQueryBuilder();
 
         String joinString = "%s INNER JOIN %s ON %s.%s = %s.%s";
+        String leftOuterJoinString = "%s LEFT OUTER JOIN %s ON %s.%s = %s.%s";
 
         //This is an inner join which looks like
         //displayed_movie INNER JOIN movie ON displayed_movie.movie_id = movie._id
@@ -63,10 +65,20 @@ public class MoviesProvider extends ContentProvider {
                 MoviesContract.MovieEntry.TABLE_NAME,
                 MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
 
+        String movieDetailJoinString = String.format(leftOuterJoinString,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY);
+
         sDisplayedMoviesQueryBuilder.setTables(displayedMoviesJoinString);
         sSavedMoviesQueryBuilder.setTables(savedMoviesJoinString);
+        sMovieDetailQueryBuilder.setTables(movieDetailJoinString);
     }
 
+    public final String LOG_TAG = MoviesProvider.class.getSimpleName();
     private MoviesDbHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
@@ -116,6 +128,10 @@ public class MoviesProvider extends ContentProvider {
                     null,
                     sortOrder
             );
+        } else if (match == MOVIE_EXTRA_WITH_MOVIE_ID) {
+            retCursor = getMovieExtraById(uri, projection, sortOrder);
+        } else if (match == MOVIE_WITH_ID) {
+            retCursor = getMovieDetailById(uri, projection, sortOrder);
         } else {
             retCursor = mOpenHelper.getReadableDatabase().query(
                     getTableName(uri),
@@ -284,6 +300,31 @@ public class MoviesProvider extends ContentProvider {
             default:
                 return super.bulkInsert(uri, values);
         }
+    }
+
+    private Cursor getMovieDetailById(Uri uri, String[] projection, String sortOrder) {
+        long _id = MoviesContract.MovieEntry.getIdFromUri(uri);
+        return sMovieDetailQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID + " = ?",
+                new String[]{Long.toString(_id)},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getMovieExtraById(Uri uri, String[] projection, String sortOrder) {
+        long movieId = MoviesContract.MovieExtraEntry.getMovieIdFromUri(uri);
+        return mOpenHelper.getReadableDatabase().query(
+                getTableName(uri),
+                projection,
+                MoviesContract.MovieExtraEntry.COLUMN_MOVIE_KEY + " = ?",
+                new String[]{Long.toString(movieId)},
+                null,
+                null,
+                sortOrder
+        );
     }
 
     private Movie getMovieById(List<Movie> movieList, int movieId) {

@@ -9,7 +9,7 @@ import com.squareup.picasso.Picasso;
 
 /**
  * Application defaults
- *
+ * <p/>
  * Created by francisco on 11/30/15.
  */
 public class Global extends Application {
