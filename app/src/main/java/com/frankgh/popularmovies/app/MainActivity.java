@@ -41,10 +41,14 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 //            actionBar.setDisplayUseLogoEnabled(false);
 //            actionBar.setDisplayHomeAsUpEnabled(false);
 
-            actionBar.setHomeButtonEnabled(true);
+//            actionBar.setHomeButtonEnabled(true);
+//            actionBar.setDisplayShowHomeEnabled(true);
+//            actionBar.setIcon(R.drawable.ic_logo); //also displays wide logo
+//            actionBar.setDisplayShowTitleEnabled(false); //optional
+
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setIcon(R.drawable.ic_logo); //also displays wide logo
-            actionBar.setDisplayShowTitleEnabled(false); //optional
+            actionBar.setIcon(R.drawable.ic_logo);
+
 
         }
 
