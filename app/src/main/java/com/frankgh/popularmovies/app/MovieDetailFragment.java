@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.data.MoviesContract;
+import com.frankgh.popularmovies.task.MovieReviewsAsyncTask;
+import com.frankgh.popularmovies.task.MovieVideosAsyncTask;
 import com.frankgh.popularmovies.util.Utility;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -51,7 +53,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] MOVIE_DETAIL_COLUMNS = {
-            MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
+            MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry.COLUMN_MOVIE_ID,
             MoviesContract.MovieEntry.COLUMN_TITLE,
             MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
             MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH,
@@ -81,6 +83,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private Uri mSelectedMovieUri;
     private Integer mMovieId;
 
+    private MovieReviewsAsyncTask mMovieReviewsAsyncTask;
+    private MovieVideosAsyncTask mMovieVideosAsyncTask;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -106,6 +111,16 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+
+        if (mMovieReviewsAsyncTask != null) {
+            mMovieReviewsAsyncTask.cancel(true);
+            mMovieReviewsAsyncTask = null;
+        }
+
+        if (mMovieVideosAsyncTask != null) {
+            mMovieVideosAsyncTask.cancel(true);
+            mMovieVideosAsyncTask = null;
+        }
     }
 
     @Override
@@ -178,12 +193,24 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private void bindMovieExtra(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
+
+            executeTasks();
+
+
             return; // no data available
         }
 
         //Gson gson = new Gson();
 
 
+    }
+
+    private void executeTasks() {
+        mMovieReviewsAsyncTask = new MovieReviewsAsyncTask(getActivity(), mMovieId);
+        mMovieVideosAsyncTask = new MovieVideosAsyncTask(getActivity(), mMovieId);
+
+        mMovieReviewsAsyncTask.execute();
+        mMovieVideosAsyncTask.execute();
     }
 
     private void bindImageToView(final String path, final ImageView imageView) {

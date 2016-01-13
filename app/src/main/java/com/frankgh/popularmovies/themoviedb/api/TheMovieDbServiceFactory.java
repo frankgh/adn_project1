@@ -1,6 +1,7 @@
 package com.frankgh.popularmovies.themoviedb.api;
 
-import com.facebook.stetho.okhttp.StethoInterceptor;
+import android.util.Log;
+
 import com.frankgh.popularmovies.BuildConfig;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
@@ -19,6 +20,8 @@ import retrofit.Retrofit;
  * Created by Francisco on 12/13/2015.
  */
 public class TheMovieDbServiceFactory {
+
+    public static final String LOG_TAG = TheMovieDbServiceFactory.class.getSimpleName();
     private static final TheMovieDbService service;
 
     static {
@@ -28,11 +31,13 @@ public class TheMovieDbServiceFactory {
 
             @Override
             public Response intercept(Chain chain) throws IOException {
+                Log.d(LOG_TAG, "Injecting API Key to " + chain.request().httpUrl().toString());
                 // Inject API Key
                 HttpUrl url = chain.request().httpUrl()
                         .newBuilder()
                         .addQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
+                Log.d(LOG_TAG, "New URL " + url.toString());
                 Request request = chain.request().newBuilder().url(url).build();
                 return chain.proceed(request);
             }
@@ -40,7 +45,7 @@ public class TheMovieDbServiceFactory {
 
         // Add the interceptor to OkHttpClient
         OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.interceptors().add(new StethoInterceptor());
+        //okHttpClient.interceptors().add(new StethoInterceptor());
         okHttpClient.interceptors().add(interceptor);
 
         Retrofit retrofit = new Retrofit.Builder()

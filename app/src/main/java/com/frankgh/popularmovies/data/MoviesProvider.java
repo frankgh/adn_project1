@@ -31,7 +31,6 @@ public class MoviesProvider extends ContentProvider {
     static final int DISPLAYED_MOVIE = 300;
     static final int SAVED_MOVIE = 400;
 
-
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sDisplayedMoviesQueryBuilder;
     private static final SQLiteQueryBuilder sSavedMoviesQueryBuilder;
