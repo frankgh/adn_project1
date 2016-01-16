@@ -8,6 +8,10 @@
     <string name="action_recent_releases">Recent Releases</string>
     <string name="action_favorites">Favorites</string>
 
+    <string name="movie_detail_added_favorite">Added movie to favorites</string>
+    <string name="movie_detail_removed_favorite">Removed movie from favorites</string>
+    <string name="movie_detail_add_favorite">Add to my favorite movies</string>
+
     <string name="grid_item_movie_poster_image">Poster Image</string>
 
     <string name="activity_movie_detail_synopsis">Synopsis</string>

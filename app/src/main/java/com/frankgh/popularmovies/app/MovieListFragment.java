@@ -24,6 +24,7 @@ import com.frankgh.popularmovies.themoviedb.api.TheMovieDbService;
 import com.frankgh.popularmovies.util.Utility;
 
 import butterknife.Bind;
+import butterknife.BindString;
 import butterknife.ButterKnife;
 
 /**
@@ -53,7 +54,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
             MoviesContract.MovieEntry.COLUMN_POSTER_PATH
     };
 
-    private  static final String [] FAVORITE_MOVIE_COLUMNS = {
+    private static final String[] FAVORITE_MOVIE_COLUMNS = {
             MoviesContract.SavedMovieEntry.TABLE_NAME + "." + MoviesContract.SavedMovieEntry._ID,
             MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
             MoviesContract.MovieEntry.COLUMN_TITLE,
@@ -69,8 +70,11 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     GridView mGridView;
     @Bind(R.id.pull_to_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindString(R.string.action_favorites)
+    String SORT_BY_FAVORITES;
     private int mPosition = GridView.INVALID_POSITION;
     private MovieAdapter mMovieAdapter;
+    private boolean mRequiresLoaderRestart;
 
     public static Fragment newInstance() {
         return new MovieListFragment();
@@ -125,6 +129,11 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onRefresh() {
         Log.d(LOG_TAG, "onRefresh(): Reloading movies");
+
+        if (SORT_BY_FAVORITES.equals(Utility.getSortingPreference(getActivity()))) {
+            mRequiresLoaderRestart = true;
+        }
+
         updateMovies();
     }
 
@@ -157,16 +166,27 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 break;
 
             case R.id.action_favorites:
-                sortBy = getString(R.string.action_favorites);
-                sortOrder = "";
+                sortBy = SORT_BY_FAVORITES;
+                sortOrder = SORT_BY_FAVORITES;
                 break;
         }
 
         if (!TextUtils.isEmpty(sortBy) && !TextUtils.isEmpty(sortOrder)) {
             String currentValue = Utility.getSortingPreference(getContext());
-            String newValue = String.format("%s.%s", sortBy, sortOrder);
+            String newValue = null;
+
+            if (SORT_BY_FAVORITES.equals(sortBy)) {
+                newValue = sortBy;
+                mRequiresLoaderRestart = true;
+            } else {
+                newValue = String.format("%s.%s", sortBy, sortOrder);
+            }
 
             if (!TextUtils.equals(currentValue, newValue)) {
+                if (SORT_BY_FAVORITES.equals(currentValue)) {
+                    mRequiresLoaderRestart = true;
+                }
+
                 Utility.updateSortingPreference(getContext(), newValue);
                 updateMovies();
                 return true;
@@ -186,20 +206,37 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     private void updateMovies() {
         mSwipeRefreshLayout.setRefreshing(true);
-        MoviesSyncAdapter.syncImmediately(getActivity());
+
+        if (!SORT_BY_FAVORITES.equals(Utility.getSortingPreference(getActivity()))) {
+            MoviesSyncAdapter.syncImmediately(getActivity());
+        }
+
+        if (mRequiresLoaderRestart) {
+            Log.d(LOG_TAG, "Restarting loader");
+            mRequiresLoaderRestart = false;
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+        }
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String preference = Utility.getSortingPreference(getActivity());
 
-        //String preference = Utility.getSortingPreference(getActivity());
-
-        //if ()
-        return new CursorLoader(getActivity(),
-                MoviesContract.DisplayedMovieEntry.CONTENT_URI,
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null);
+        if (SORT_BY_FAVORITES.equals(preference)) {
+            // Favorite movies
+            return new CursorLoader(getActivity(),
+                    MoviesContract.SavedMovieEntry.CONTENT_URI,
+                    FAVORITE_MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null);
+        } else {
+            return new CursorLoader(getActivity(),
+                    MoviesContract.DisplayedMovieEntry.CONTENT_URI,
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null);
+        }
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

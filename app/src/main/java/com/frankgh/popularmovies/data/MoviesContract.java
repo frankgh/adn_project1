@@ -79,6 +79,10 @@ public class MoviesContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static long getIdFromUri(@NonNull Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
     }
 
     public static final class MovieEntry implements BaseColumns {

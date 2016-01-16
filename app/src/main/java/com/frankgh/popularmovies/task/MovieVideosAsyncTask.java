@@ -3,6 +3,8 @@ package com.frankgh.popularmovies.task;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.frankgh.popularmovies.data.MoviesContract;
@@ -18,26 +20,38 @@ import retrofit.Response;
 /**
  * @author Francisco Guerrero <email>me@frankgh.com</email> on 1/11/16.
  */
-public class MovieVideosAsyncTask extends AsyncTask<Void, Void, Void> {
+public class MovieVideosAsyncTask extends AsyncTask<Void, Void, List<Video>> {
 
     private final String LOG_TAG = MovieVideosAsyncTask.class.getSimpleName();
 
     private long mMovieId;
     private Context mContext;
+    private Fragment mFragment;
 
-    public MovieVideosAsyncTask(Context context, long movieId) {
+    public MovieVideosAsyncTask(@NonNull Fragment fragment, long movieId) {
         mMovieId = movieId;
-        mContext = context;
+        mFragment = fragment;
+        mContext = fragment.getActivity();
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected List<Video> doInBackground(Void... params) {
         MovieVideosResponse response = loadMovieVideos();
         if (response != null) {
             persistMovieVideos(response.getResults());
+            return response.getResults();
         }
 
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(List<Video> videos) {
+        super.onPostExecute(videos);
+
+        if (mFragment != null) {
+            ((Callback) mFragment).onMovieVideosLoaded(videos);
+        }
     }
 
     private MovieVideosResponse loadMovieVideos() {
@@ -76,5 +90,18 @@ public class MovieVideosAsyncTask extends AsyncTask<Void, Void, Void> {
                 MoviesContract.MovieExtraEntry.CONTENT_URI,
                 values
         );
+    }
+
+    /**
+     * A callback interface that all fragments containing this task can implement.
+     * This mechanism allows activities to be notified when movie videos are loaded.
+     */
+    public interface Callback {
+        /**
+         * MovieVideosAsyncTaskCallback for when movie reviews have been loaded.
+         *
+         * @param videos the movie videos
+         */
+        void onMovieVideosLoaded(List<Video> videos);
     }
 }

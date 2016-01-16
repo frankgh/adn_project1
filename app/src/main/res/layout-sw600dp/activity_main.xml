@@ -9,21 +9,27 @@
 
     <include layout="@layout/main_toolbar" />
 
-    <fragment
-        android:id="@+id/fragment_main"
-        class="com.frankgh.popularmovies.app.MovieListFragment"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:layout="@layout/fragment_movie_list" />
+    <LinearLayout
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/fragment_movie_detail"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="4" />
+        <fragment
+            android:id="@+id/fragment_main"
+            class="com.frankgh.popularmovies.app.MovieListFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:layout="@layout/fragment_movie_list" />
 
+        <FrameLayout
+            android:id="@+id/fragment_movie_detail"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4" />
+
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
 
 

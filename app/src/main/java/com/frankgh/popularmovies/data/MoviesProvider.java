@@ -33,11 +33,13 @@ public class MoviesProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sDisplayedMoviesQueryBuilder;
+    private static final SQLiteQueryBuilder sFavoritedMoviesQueryBuilder;
     private static final SQLiteQueryBuilder sSavedMoviesQueryBuilder;
     private static final SQLiteQueryBuilder sMovieDetailQueryBuilder;
 
     static {
         sDisplayedMoviesQueryBuilder = new SQLiteQueryBuilder();
+        sFavoritedMoviesQueryBuilder = new SQLiteQueryBuilder();
         sSavedMoviesQueryBuilder = new SQLiteQueryBuilder();
         sMovieDetailQueryBuilder = new SQLiteQueryBuilder();
 
@@ -53,6 +55,15 @@ public class MoviesProvider extends ContentProvider {
                 MoviesContract.DisplayedMovieEntry.COLUMN_MOVIE_KEY,
                 MoviesContract.MovieEntry.TABLE_NAME,
                 MoviesContract.MovieEntry.COLUMN_MOVIE_ID);
+
+        String favoritedMoviesJoinString = String.format(joinString,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.TABLE_NAME,
+                MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY,
+                MoviesContract.MovieEntry.TABLE_NAME,
+                MoviesContract.MovieEntry.COLUMN_MOVIE_ID
+        );
 
         //This is an inner join which looks like
         //saved_movie INNER JOIN movie ON saved_movie.movie_id = movie._id
@@ -73,6 +84,7 @@ public class MoviesProvider extends ContentProvider {
                 MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY);
 
         sDisplayedMoviesQueryBuilder.setTables(displayedMoviesJoinString);
+        sFavoritedMoviesQueryBuilder.setTables(favoritedMoviesJoinString);
         sSavedMoviesQueryBuilder.setTables(savedMoviesJoinString);
         sMovieDetailQueryBuilder.setTables(movieDetailJoinString);
     }
@@ -118,7 +130,16 @@ public class MoviesProvider extends ContentProvider {
 
         final int match = sUriMatcher.match(uri);
 
-        if (match == DISPLAYED_MOVIE) {
+        if (match == SAVED_MOVIE) {
+            retCursor = sFavoritedMoviesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+            );
+        } else if (match == DISPLAYED_MOVIE) {
             retCursor = sDisplayedMoviesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                     projection,
                     selection,
@@ -176,6 +197,8 @@ public class MoviesProvider extends ContentProvider {
                     return MoviesContract.MovieEntry.buildMovieUri(_id);
                 case MOVIE_EXTRA:
                     return MoviesContract.MovieExtraEntry.buildMovieExtraUri(_id);
+                case SAVED_MOVIE:
+                    return MoviesContract.SavedMovieEntry.buildMovieUri(_id);
             }
         }
 

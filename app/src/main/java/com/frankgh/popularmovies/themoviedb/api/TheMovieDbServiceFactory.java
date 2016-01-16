@@ -37,7 +37,7 @@ public class TheMovieDbServiceFactory {
                         .newBuilder()
                         .addQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
-                Log.d(LOG_TAG, "New URL " + url.toString());
+                Log.d(LOG_TAG, "New URL with API Key built");
                 Request request = chain.request().newBuilder().url(url).build();
                 return chain.proceed(request);
             }
