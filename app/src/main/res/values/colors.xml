@@ -3,7 +3,8 @@
     <color name="colorPrimary">#F44336</color>
     <color name="colorPrimaryTransparent">#EF9A9A</color>
     <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorAccent">#40C4FF</color>
+    <color name="colorAccent">#FF5252</color>
     <color name="colorItemPressed">#66999999</color>
     <color name="colorItemSelected">#FFCDD2</color>
+    <color name="colorMoviePill">#acf44336</color>
 </resources>

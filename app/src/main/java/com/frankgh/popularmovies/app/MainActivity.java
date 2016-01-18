@@ -34,22 +34,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-//            actionBar.setIcon(R.drawable.ic_logo);
-//            //actionBar.setDisplayShowHomeEnabled(false);
-//            actionBar.setHomeButtonEnabled(false);
-//            actionBar.setDisplayShowTitleEnabled(false);
-//            actionBar.setDisplayUseLogoEnabled(false);
-//            actionBar.setDisplayHomeAsUpEnabled(false);
-
-//            actionBar.setHomeButtonEnabled(true);
-//            actionBar.setDisplayShowHomeEnabled(true);
-//            actionBar.setIcon(R.drawable.ic_logo); //also displays wide logo
-//            actionBar.setDisplayShowTitleEnabled(false); //optional
-
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setIcon(R.drawable.ic_logo);
-
-
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayUseLogoEnabled(false);
         }
 
         mTwoPane = findViewById(R.id.fragment_movie_detail) != null;

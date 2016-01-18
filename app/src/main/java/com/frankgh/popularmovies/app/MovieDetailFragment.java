@@ -4,12 +4,16 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,9 +75,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
     @Bind(R.id.posterImageView)
+    @Nullable
     ImageView mPosterImageView;
     @Bind(R.id.backdrop_image_view)
     ImageView mBackdropImageView;
+    @Bind(R.id.movieTitleTextView)
+    TextView mMovieTitleTextView;
     @Bind(R.id.movieReleaseDateTextView)
     TextView mMovieReleaseDateTextView;
     @Bind(R.id.grid_item_movie_vote_average)
@@ -82,6 +89,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     TextView mMovieOverviewTextView;
     @Bind(R.id.favorite_fab)
     FloatingActionButton mFavoriteFab;
+    @Bind(R.id.toolbar)
+    @Nullable
+    Toolbar toolbar;
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
 
     private Uri mSelectedMovieUri;
     private Long mMovieId;
@@ -95,7 +107,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
-        getActivity().setTitle("");
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+
+        if (toolbar != null) {
+            activity.setSupportActionBar(toolbar);
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -229,6 +247,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             return;
         }
 
+        String movieTitle = data.getString(COL_MOVIE_TITLE);
+
+        getActivity().setTitle(movieTitle);
+        collapsingToolbar.setTitle(movieTitle);
+        mMovieTitleTextView.setText(movieTitle);
+
         mMovieId = data.getLong(COL_MOVIE_ID);
         mSavedMovieId = data.isNull(COL_SAVED_MOVIE_ID) ? null : data.getLong(COL_SAVED_MOVIE_ID);
         mMovieOverviewTextView.setText(data.getString(COL_MOVIE_OVERVIEW));
@@ -238,7 +262,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         // Load movie extra data
         getLoaderManager().initLoader(MOVIE_EXTRA_LOADER, null, this);
 
-        bindImageToView(Utility.getPosterAbsolutePath(data.getString(COL_MOVIE_POSTER_PATH)), mPosterImageView);
+        if (mPosterImageView != null) {
+            bindImageToView(Utility.getPosterAbsolutePath(data.getString(COL_MOVIE_POSTER_PATH)), mPosterImageView);
+        }
         bindImageToView(Utility.getBackDropAbsolutePath(data.getString(COL_MOVIE_BACKDROP_PATH)), mBackdropImageView);
         updateFavoriteFab();
     }

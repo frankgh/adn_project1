@@ -61,19 +61,19 @@ public class Utility {
     }
 
     /**
-     * Returns the Absolut Path the the backdrop image with a default size
+     * Returns the Absolute Path the the backdrop image with a default size
      *
      * @return the absolute path
      */
     public static String getBackDropAbsolutePath(String backdropPath) {
-        return getBackDropAbsolutePath(backdropPath, "w300");
+        return getBackDropAbsolutePath(backdropPath, "w780");
     }
 
     /**
      * Returns the Absolute Path to the backdrop image. Possible sizes are:
-     * w92, w154, w185, w342", "w500", "w780", or "original"
+     * "w300", "w780", "w1280", "original"
      *
-     * @param imageSize one of the possible sizes: w92, w154, w185, w342, w500, w780, or original
+     * @param imageSize one of the possible sizes: "w300", "w780", "w1280", "original"
      * @return the absolute path for the given imageSize
      */
     public static String getBackDropAbsolutePath(String backdropPath, String imageSize) {

@@ -60,7 +60,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                         MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL UNIQUE," +
                         MoviesContract.SavedMovieEntry.COLUMN_IS_SAVED + " INTEGER NOT NULL," +
                         MoviesContract.SavedMovieEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
-                        MoviesContract.SavedMovieEntry.COLUMN_UPDATED_DATE + " INTEGER NOT NULL," +
+                        MoviesContract.SavedMovieEntry.COLUMN_UPDATED_DATE + " INTEGER," +
 
                         // Set up the movie column as a foreign key to movie table.
                         " FOREIGN KEY (" + MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +

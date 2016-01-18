@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="activity_movie_detail_backdrop_image_height">325dp</dimen>
+    <dimen name="movie_detail_poster_image_height">158dp</dimen>
+    <dimen name="movie_detail_poster_image_width">113dp</dimen>
+</resources>

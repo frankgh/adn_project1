@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/grid_item_movie_height"
-    android:orientation="vertical">
+    android:layout_height="@dimen/grid_item_movie_height">
 
     <ImageView
         android:id="@+id/posterImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/grid_item_movie_poster_image"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitXY" />
 
     <LinearLayout
         android:id="@+id/grid_item_movie_pill"
         android:layout_width="match_parent"
         android:layout_height="@dimen/grid_item_movie_pill_height"
         android:layout_gravity="center_horizontal|bottom"
+        android:background="@color/colorMoviePill"
         android:contentDescription="@string/grid_item_movie_poster_image"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="invisible">
 
         <TextView
-            android:fontFamily="sans-serif-condensed"
             android:id="@+id/grid_item_movie_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/grid_item_movie_pill_item_margin"
             android:layout_marginRight="@dimen/grid_item_movie_pill_item_margin_right"
             android:layout_weight="1"
+            android:fontFamily="sans-serif-condensed"
             android:maxLines="2"
             android:singleLine="false"
             android:textAppearance="?android:attr/textAppearanceSmall"

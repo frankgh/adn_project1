@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.graphics.Palette;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,7 +75,6 @@ public class MovieAdapter extends CursorAdapter {
 
                         @Override
                         public void onError() {
-                            viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                             //Try again online if cache failed
                             Picasso.with(context)
                                     .load(posterAbsolutePath)
@@ -88,19 +88,27 @@ public class MovieAdapter extends CursorAdapter {
                                         @Override
                                         public void onError() {
                                             Log.v(LOG_TAG, "Could not fetch image from " + posterAbsolutePath);
-                                            viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                            showErrorImage(viewHolder);
                                         }
                                     });
                         }
                     });
         } else {
-            viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             viewHolder.posterImageView.setImageResource(R.drawable.ic_movie_placeholder); // set default placeholder
-            viewHolder.posterImageView.setPadding(100, 100, 100, 100); // add padding
+            showErrorImage(viewHolder);
         }
     }
 
+    private void showErrorImage(ViewHolder viewHolder) {
+        viewHolder.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        viewHolder.posterImageView.setPadding(100, 100, 100, 100); // add padding
+    }
+
     private void setPillPalette(final ViewHolder holder) {
+        holder.moviePillView.setVisibility(View.VISIBLE);
+        holder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        holder.posterImageView.setPadding(0, 0, 0, 0);
+
         Bitmap bitmap = ((BitmapDrawable) holder.posterImageView.getDrawable()).getBitmap();
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             @Override
@@ -113,12 +121,15 @@ public class MovieAdapter extends CursorAdapter {
                     holder.starImageView.setColorFilter(vibrant.getTitleTextColor());
                     holder.moviePillView.setBackgroundColor(ColorUtils
                             .setAlphaComponent(palette.getMutedColor(vibrant.getRgb()), 220));
-                    holder.moviePillView.setVisibility(View.VISIBLE);
-                    holder.posterImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    holder.posterImageView.setPadding(0, 0, 0, 0);
                 }
             }
         });
+    }
+
+    public int pxToDp(final Context context, int px) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int dp = Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return dp;
     }
 
     @Override
