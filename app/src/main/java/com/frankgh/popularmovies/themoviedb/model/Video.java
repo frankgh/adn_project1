@@ -7,6 +7,8 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Video {
 
+    private static final String YOU_TUBE_THUMBNAIL_URL = "http://img.youtube.com/vi/%s/hqdefault.jpg";
+
     private String id;
     @SerializedName("iso_639_1")
     private String iso6391;
@@ -42,6 +44,13 @@ public class Video {
 
     public String getType() {
         return type;
+    }
+
+    public String getYouTubeThumbnailUrl() {
+        if ("YouTube".equals(getSite())) {
+            return String.format(YOU_TUBE_THUMBNAIL_URL, getKey());
+        }
+        return null;
     }
 
     @Override

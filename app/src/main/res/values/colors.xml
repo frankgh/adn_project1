@@ -6,5 +6,7 @@
     <color name="colorAccent">#FF5252</color>
     <color name="colorItemPressed">#66999999</color>
     <color name="colorItemSelected">#FFCDD2</color>
-    <color name="colorMoviePill">#acf44336</color>
+    <color name="colorMoviePill">#ACF44336</color>
+    <color name="colorPrimaryText">#DE000000</color>
+    <color name="colorSecondaryText">#8A000000</color>
 </resources>

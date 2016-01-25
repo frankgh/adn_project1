@@ -15,65 +15,99 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/movieTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/movieTitleTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-condensed"
-                android:maxLines="2"
-                tools:text="Star Wars: The Force Awakens"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/movieReleaseDateTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="September 2015"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:layout_gravity="right"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/grid_item_movie_vote_average"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="6.8"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <ImageView
-                        android:id="@+id/starImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_star_16dp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_marginRight="@dimen/movie_title_margin_right"
+            android:fontFamily="sans-serif-condensed"
+            android:maxLines="3"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            tools:text="Star Wars: The Force Awakens" />
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
+            android:layout_marginTop="@dimen/movie_detail_card_margin_top"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/cardview_regular_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/activity_movie_detail_storyline"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/movieReleaseDateTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            tools:text="September 2015" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/grid_item_movie_vote_average"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                tools:text="6.8" />
+
+                            <ImageView
+                                android:id="@+id/starImageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_star_16dp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <include layout="@layout/divider_line" />
+
+                <TextView
+                    android:id="@+id/movieOverviewTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/cardview_regular_margin"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/colorSecondaryText"
+                    tools:text="Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park. Jurassic World, as originally envisioned by John Hammond." />
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/movie_detail_card_margin_top"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -83,15 +117,86 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/activity_movie_detail_synopsis"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:layout_margin="@dimen/cardview_regular_margin"
+                    android:layout_weight="1"
+                    android:text="@string/activity_movie_detail_trailers"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                <include layout="@layout/divider_line" />
 
                 <TextView
-                    android:id="@+id/movieOverviewTextView"
+                    android:id="@+id/empty_trailers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="@dimen/cardview_not_available"
+                    android:text="@string/no_trailers"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/movie_detail_trailer_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/movie_detail_videos_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="@dimen/cardview_regular_margin"
+                        android:layout_marginTop="@dimen/cardview_regular_margin"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/movie_detail_card_margin_top"
+            android:layout_marginTop="@dimen/movie_detail_card_margin_top"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/movie_detail_reviews_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="Small Text"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:layout_margin="@dimen/cardview_regular_margin"
+                    android:layout_weight="1"
+                    android:text="@string/activity_movie_detail_reviews"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                <include layout="@layout/divider_line" />
+
+                <TextView
+                    android:id="@+id/empty_reviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="@dimen/cardview_not_available"
+                    android:text="@string/no_reviews"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/movie_detail_review_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>

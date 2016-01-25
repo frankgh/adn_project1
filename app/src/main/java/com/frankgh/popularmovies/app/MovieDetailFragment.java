@@ -1,6 +1,8 @@
 package com.frankgh.popularmovies.app;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
@@ -29,6 +33,8 @@ import com.frankgh.popularmovies.task.MovieVideosAsyncTask;
 import com.frankgh.popularmovies.themoviedb.model.Review;
 import com.frankgh.popularmovies.themoviedb.model.Video;
 import com.frankgh.popularmovies.util.Utility;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -57,6 +63,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     static final int COL_SAVED_MOVIE_ID = 7;
 
     static final String DETAIL_URI = "URI";
+    static final int COL_EXTRA_NAME = 0;
+    static final int COL_EXTRA_VALUE = 1;
     private static final int MOVIE_DETAIL_LOADER = 0;
     private static final int MOVIE_EXTRA_LOADER = 10;
     // For the movie view we're showing only a small subset of the stored data.
@@ -70,6 +78,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             MoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
             MoviesContract.MovieEntry.COLUMN_OVERVIEW,
             MoviesContract.SavedMovieEntry.TABLE_NAME + "." + MoviesContract.SavedMovieEntry._ID
+    };
+    private static final String[] MOVIE_EXTRA_COLUMNS = {
+            MoviesContract.MovieExtraEntry.COLUMN_EXTRA_NAME,
+            MoviesContract.MovieExtraEntry.COLUMN_EXTRA_VALUE
     };
 
     private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
@@ -94,6 +106,18 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     Toolbar toolbar;
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
+    @Bind(R.id.movie_detail_review_progress_bar)
+    ProgressBar movieReviewsProgressBar;
+    @Bind(R.id.movie_detail_trailer_progress_bar)
+    ProgressBar movieTrailersProgressBar;
+    @Bind(R.id.empty_reviews)
+    TextView mEmptyReviewsTextView;
+    @Bind(R.id.empty_trailers)
+    TextView mEmptyTrailersTextView;
+    @Bind(R.id.movie_detail_reviews_container)
+    LinearLayout mReviewsContainer;
+    @Bind(R.id.movie_detail_videos_container)
+    LinearLayout mVideosContainer;
 
     private Uri mSelectedMovieUri;
     private Long mMovieId;
@@ -101,6 +125,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private MovieReviewsAsyncTask mMovieReviewsAsyncTask;
     private MovieVideosAsyncTask mMovieVideosAsyncTask;
+
+    private LayoutInflater inflater;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -125,8 +151,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+        inflater = getLayoutInflater(savedInstanceState);
+        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
     }
 
     @Override
@@ -165,7 +192,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 return new CursorLoader(
                         getActivity(),
                         MoviesContract.MovieExtraEntry.buildMovieExtraUri(mMovieId),
-                        null,
+                        MOVIE_EXTRA_COLUMNS,
                         null,
                         null,
                         null
@@ -189,16 +216,46 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        // DO NOTHING
     }
 
     @Override
     public void onMovieReviewsLoaded(List<Review> reviews) {
+        movieReviewsProgressBar.setVisibility(View.GONE);
 
+        if (reviews == null || reviews.isEmpty()) {
+            mEmptyReviewsTextView.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        for (int i = 0; i < reviews.size(); i++) {
+            addReviewView(mReviewsContainer, reviews.get(i).getAuthor(), reviews.get(i).getContent());
+
+            if (i + 1 != reviews.size()) {
+                addDividerLineView(mReviewsContainer);
+            }
+        }
     }
 
     @Override
     public void onMovieVideosLoaded(List<Video> videos) {
+        movieTrailersProgressBar.setVisibility(View.GONE);
+        int videoCount = 0;
 
+        if (videos != null) {
+            for (Video video : videos) {
+                if (video.getYouTubeThumbnailUrl() != null) {
+                    addVideoView(mVideosContainer, video);
+                    videoCount++;
+                }
+            }
+        }
+
+        if (videoCount == 0) {
+            mEmptyTrailersTextView.setVisibility(View.VISIBLE);
+        } else {
+            mVideosContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     @OnClick(R.id.favorite_fab)
@@ -225,19 +282,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
         Snackbar.make(getView(), R.string.movie_detail_added_favorite, Snackbar.LENGTH_SHORT).show();
         mSavedMovieId = MoviesContract.SavedMovieEntry.getIdFromUri(savedMovieUri);
-        updateFavoriteFab();
-    }
-
-    private void removeMovieFromFavorites() {
-        // Delete movie from favorites
-        if (getContext().getContentResolver().delete(
-                MoviesContract.SavedMovieEntry.CONTENT_URI,
-                MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + " = ?",
-                new String[]{Long.toString(mMovieId)}
-        ) != 0) {
-            mSavedMovieId = null;
-            Snackbar.make(getView(), R.string.movie_detail_removed_favorite, Snackbar.LENGTH_SHORT).show();
-        }
         updateFavoriteFab();
     }
 
@@ -269,21 +313,107 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         updateFavoriteFab();
     }
 
-    private void updateFavoriteFab() {
-        mFavoriteFab.setImageResource((mSavedMovieId == null) ?
-                R.drawable.ic_favorite_outline_24dp :
-                R.drawable.ic_favorite_24dp);
-    }
-
     private void bindMovieExtra(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
             executeTasks();
             return; // no data available
         }
 
-        //Gson gson = new Gson();
+        Gson gson = new Gson();
 
+        do {
+            String name = data.getString(COL_EXTRA_NAME),
+                    value = data.getString(COL_EXTRA_VALUE);
 
+            if (!TextUtils.isEmpty(value)) {
+                if (TextUtils.equals(name, MoviesContract.MovieExtraEntry.NAME_REVIEWS)) {
+
+                    try {
+                        List<Review> reviews = gson.fromJson(value, new TypeToken<List<Review>>() {
+                        }.getType());
+
+                        onMovieReviewsLoaded(reviews);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Unable to deserialize review data for movie with id: " + mMovieId, e);
+                    }
+                } else if (TextUtils.equals(name, MoviesContract.MovieExtraEntry.NAME_VIDEOS)) {
+
+                    try {
+                        List<Video> videos = gson.fromJson(value, new TypeToken<List<Video>>() {
+                        }.getType());
+
+                        onMovieVideosLoaded(videos);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Unable to deserialize video data for movie with id: " + mMovieId, e);
+                    }
+                }
+            }
+        } while (data.moveToNext());
+    }
+
+    private void updateFavoriteFab() {
+        mFavoriteFab.setImageResource((mSavedMovieId == null) ?
+                R.drawable.ic_favorite_outline_24dp :
+                R.drawable.ic_favorite_24dp);
+    }
+
+    private void removeMovieFromFavorites() {
+        // Delete movie from favorites
+        if (getContext().getContentResolver().delete(
+                MoviesContract.SavedMovieEntry.CONTENT_URI,
+                MoviesContract.SavedMovieEntry.COLUMN_MOVIE_KEY + " = ?",
+                new String[]{Long.toString(mMovieId)}
+        ) != 0) {
+            mSavedMovieId = null;
+            Snackbar.make(getView(), R.string.movie_detail_removed_favorite, Snackbar.LENGTH_SHORT).show();
+        }
+        updateFavoriteFab();
+    }
+
+    private void addVideoView(LinearLayout container, final Video video) {
+        final View trailerView = inflater.inflate(R.layout.movie_detail_trailer, container, false);
+        ImageView thumbnailImageView = ButterKnife.findById(trailerView, R.id.movie_detail_trailer_thumbnail);
+        ImageView playImageView = ButterKnife.findById(trailerView, R.id.movie_detail_play_image_view);
+
+        playImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openYoutubeIntent(video.getKey());
+            }
+        });
+
+        bindImageToView(video.getYouTubeThumbnailUrl(), thumbnailImageView);
+
+        container.addView(trailerView);
+    }
+
+    /**
+     * Answer found in http://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+     *
+     * @param id
+     */
+    private void openYoutubeIntent(String id) {
+        Intent intent = null;
+        try {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        } catch (ActivityNotFoundException ex) {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + id));
+        }
+        startActivity(intent);
+    }
+
+    private void addReviewView(LinearLayout container, String author, String content) {
+        final View reviewView = inflater.inflate(R.layout.movie_detail_review, container, false);
+        TextView reviewAuthor = ButterKnife.findById(reviewView, R.id.movie_detail_review_author);
+        TextView reviewContent = ButterKnife.findById(reviewView, R.id.movie_detail_review_content);
+        reviewAuthor.setText(author);
+        reviewContent.setText(content);
+        container.addView(reviewView);
+    }
+
+    private void addDividerLineView(LinearLayout container) {
+        final View dividerLineView = inflater.inflate(R.layout.divider_line, container, false);
+        container.addView(dividerLineView);
     }
 
     /**

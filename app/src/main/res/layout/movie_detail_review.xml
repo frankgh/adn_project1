@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/cardview_regular_margin"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/movie_detail_review_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="Pedro Faria" />
+
+    <TextView
+        android:id="@+id/movie_detail_review_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/colorSecondaryText"
+        tools:text="Surprising and fun. Robert De Niro and Zack Efron makes us laugh until the end of the movie. Sure its not a masterpiece, but it's fun and fresh. A word to Aubrey Plaza that has a very fun performance. The stories starts on the day that Zack Afron's grandmother dies, one week before he is about to marry. His grandfather, now widowed, asks him to go on a trip with him. Here is when the fun starts with alcohol, naked ladies, drugs and a lot of party mixed up is where you can find your true self and may have some epiphany on how their life will be in the future. It's a movie to have a great night and to relax, with great jokes and a lot of double-meaning words." />
+
+</LinearLayout>
