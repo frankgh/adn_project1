@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.MovieDetailFragment"
-    tools:showIn="@layout/activity_movie_detail">
+    tools:context=".app.MovieDetailFragment">
 
     <include
         android:id="@+id/header_bar"
