@@ -11,9 +11,9 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:fitsSystemWindows="true"
+        app:collapsedTitleTextAppearance="@style/HeaderTitleStyle"
         app:contentScrim="?attr/colorPrimary"
         app:expandedTitleTextAppearance="@style/TransparentTitleStyle"
-        app:collapsedTitleTextAppearance="@style/HeaderTitleStyle"
         app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
         <ImageView
@@ -33,6 +33,7 @@
             android:contentDescription="@string/grid_item_movie_poster_image"
             android:elevation="@dimen/movie_detail_poster_elevation"
             android:fitsSystemWindows="true"
+            android:transitionName="detailPosterTransition"
             app:layout_collapseMode="pin"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" />
 

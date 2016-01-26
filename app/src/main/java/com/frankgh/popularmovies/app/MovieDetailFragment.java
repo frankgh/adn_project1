@@ -1,6 +1,7 @@
 package com.frankgh.popularmovies.app;
 
 import android.content.ActivityNotFoundException;
+import android.content.ClipDescription;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +20,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,6 +66,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     static final int COL_MOVIE_OVERVIEW = 6;
     static final int COL_SAVED_MOVIE_ID = 7;
 
+    static final String YOU_TUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
     static final String DETAIL_URI = "URI";
     static final int COL_EXTRA_NAME = 0;
     static final int COL_EXTRA_VALUE = 1;
@@ -122,6 +127,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private Uri mSelectedMovieUri;
     private Long mMovieId;
     private Long mSavedMovieId;
+    private String mTrailerYouTubeKey;
 
     private MovieReviewsAsyncTask mMovieReviewsAsyncTask;
     private MovieVideosAsyncTask mMovieVideosAsyncTask;
@@ -146,6 +152,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             mSelectedMovieUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
         }
 
+        setHasOptionsMenu(true);
+
         return rootView;
     }
 
@@ -154,6 +162,22 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         super.onActivityCreated(savedInstanceState);
         inflater = getLayoutInflater(savedInstanceState);
         getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_movie_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_share:
+                openShareIntent();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -245,6 +269,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         if (videos != null) {
             for (Video video : videos) {
                 if (video.getYouTubeThumbnailUrl() != null) {
+
+                    if (TextUtils.isEmpty(mTrailerYouTubeKey)) {
+                        mTrailerYouTubeKey = video.getKey();
+                    }
+
                     addVideoView(mVideosContainer, video);
                     videoCount++;
                 }
@@ -252,6 +281,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         }
 
         if (videoCount == 0) {
+            setHasOptionsMenu(false); // Hide share option menu
             mEmptyTrailersTextView.setVisibility(View.VISIBLE);
         } else {
             mVideosContainer.setVisibility(View.VISIBLE);
@@ -397,9 +427,17 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         try {
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
         } catch (ActivityNotFoundException ex) {
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + id));
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOU_TUBE_VIDEO_URL + id));
         }
         startActivity(intent);
+    }
+
+    private void openShareIntent() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType(ClipDescription.MIMETYPE_TEXT_PLAIN);
+        intent.putExtra(Intent.EXTRA_TEXT, YOU_TUBE_VIDEO_URL + mTrailerYouTubeKey);
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, mMovieTitleTextView.getText());
+        startActivity(Intent.createChooser(intent, getActivity().getString(R.string.action_share)));
     }
 
     private void addReviewView(LinearLayout container, String author, String content) {

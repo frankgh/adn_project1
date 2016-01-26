@@ -1,12 +1,15 @@
 package com.frankgh.popularmovies.app;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.sync.MoviesSyncAdapter;
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String DETAIL_FRAGMENT_TAG = "MOVIE_DETAIL_FRAGMENT";
+    private static final String DETAIL_TRANSITION_NAME = "detailPosterTransition";
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     }
 
     @Override
-    public void onMovieSelected(Uri movieUri) {
+    public void onMovieSelected(Uri movieUri, View sharedView) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a fragment transaction.
@@ -74,9 +78,15 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
                     .replace(R.id.fragment_movie_detail, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
+
+            ActivityOptions options = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                options = ActivityOptions.makeSceneTransitionAnimation(this, sharedView, DETAIL_TRANSITION_NAME);
+            }
+
             Intent intent = new Intent(this, MovieDetailActivity.class)
                     .setData(movieUri);
-            startActivity(intent);
+            startActivity(intent, (options != null ? options.toBundle() : null));
         }
     }
 }

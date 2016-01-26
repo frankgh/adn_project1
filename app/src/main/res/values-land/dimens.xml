@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="movie_detail_trailer_thumbnail_width">120dp</dimen>
+    <dimen name="movie_detail_trailer_thumbnail_height">90dp</dimen>
+</resources>

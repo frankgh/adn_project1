@@ -103,7 +103,7 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
                 if (cursor != null) {
                     Uri movieDetailUri = MoviesContract.MovieEntry.buildMovieUri(cursor.getLong(MovieListFragment.COL_MOVIE_ID));
                     ((Callback) getActivity())
-                            .onMovieSelected(movieDetailUri);
+                            .onMovieSelected(movieDetailUri, view);
                 }
                 mPosition = position;
             }
@@ -266,6 +266,6 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
          *
          * @param movieUri the movie URI
          */
-        void onMovieSelected(Uri movieUri);
+        void onMovieSelected(Uri movieUri, View sharedView);
     }
 }

@@ -2,14 +2,13 @@ package com.frankgh.popularmovies.app;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.frankgh.popularmovies.R;
 
 import butterknife.ButterKnife;
 
 public class MovieDetailActivity extends AppCompatActivity {
-
-    public final static String MOVIE_DETAIL_KEY = "MOVIE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,4 +29,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }
