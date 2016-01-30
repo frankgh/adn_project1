@@ -167,7 +167,6 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/movie_detail_reviews_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -197,6 +196,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal" />
+
+                <LinearLayout
+                    android:id="@+id/movie_detail_reviews_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"></LinearLayout>
 
             </LinearLayout>
         </android.support.v7.widget.CardView>

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -94,35 +95,58 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Bind(R.id.posterImageView)
     @Nullable
     ImageView mPosterImageView;
+
     @Bind(R.id.backdrop_image_view)
     ImageView mBackdropImageView;
+
     @Bind(R.id.movieTitleTextView)
     TextView mMovieTitleTextView;
+
     @Bind(R.id.movieReleaseDateTextView)
     TextView mMovieReleaseDateTextView;
+
     @Bind(R.id.grid_item_movie_vote_average)
     TextView mMovieVoteAverageTextView;
+
     @Bind(R.id.movieOverviewTextView)
     TextView mMovieOverviewTextView;
+
     @Bind(R.id.favorite_fab)
     FloatingActionButton mFavoriteFab;
+
     @Bind(R.id.toolbar)
     @Nullable
     Toolbar toolbar;
+
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
+
     @Bind(R.id.movie_detail_review_progress_bar)
     ProgressBar movieReviewsProgressBar;
+
     @Bind(R.id.movie_detail_trailer_progress_bar)
     ProgressBar movieTrailersProgressBar;
+
     @Bind(R.id.empty_reviews)
     TextView mEmptyReviewsTextView;
+
     @Bind(R.id.empty_trailers)
     TextView mEmptyTrailersTextView;
+
     @Bind(R.id.movie_detail_reviews_container)
     LinearLayout mReviewsContainer;
+
     @Bind(R.id.movie_detail_videos_container)
     LinearLayout mVideosContainer;
+
+    @Bind(R.id.empty_detail_layout)
+    LinearLayout mEmptyDetailLayout;
+
+    @Bind(R.id.header_bar)
+    View mHeaderBarView;
+
+    @Bind(R.id.movie_detail_body)
+    View mBodyView;
 
     private Uri mSelectedMovieUri;
     private Long mMovieId;
@@ -147,12 +171,18 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        Log.d(LOG_TAG, "onCreateView");
+
         Bundle arguments = getArguments();
         if (arguments != null) {
             mSelectedMovieUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
+            setHasOptionsMenu(true);
+            toggleMovieDetail(true);
+        } else {
+            toggleMovieDetail(false);
         }
 
-        setHasOptionsMenu(true);
+        Log.d(LOG_TAG, "onCreateView mMovieId: " + mMovieId);
 
         return rootView;
     }
@@ -161,7 +191,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         inflater = getLayoutInflater(savedInstanceState);
-        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
+
+        Log.d(LOG_TAG, "onActivityCreated");
+        // Load movie detail data
+        if (mSelectedMovieUri != null) {
+            getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
+        }
     }
 
     @Override
@@ -213,14 +248,16 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 break;
 
             case MOVIE_EXTRA_LOADER:
-                return new CursorLoader(
-                        getActivity(),
-                        MoviesContract.MovieExtraEntry.buildMovieExtraUri(mMovieId),
-                        MOVIE_EXTRA_COLUMNS,
-                        null,
-                        null,
-                        null
-                );
+                if (mMovieId != null) {
+                    return new CursorLoader(
+                            getActivity(),
+                            MoviesContract.MovieExtraEntry.buildMovieExtraUri(mMovieId),
+                            MOVIE_EXTRA_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
         }
         return null;
     }
@@ -246,6 +283,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onMovieReviewsLoaded(List<Review> reviews) {
         movieReviewsProgressBar.setVisibility(View.GONE);
+        mReviewsContainer.removeAllViews();
 
         if (reviews == null || reviews.isEmpty()) {
             mEmptyReviewsTextView.setVisibility(View.VISIBLE);
@@ -264,6 +302,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onMovieVideosLoaded(List<Video> videos) {
         movieTrailersProgressBar.setVisibility(View.GONE);
+        mVideosContainer.removeAllViews();
         int videoCount = 0;
 
         if (videos != null) {
@@ -317,7 +356,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private void bindMovieDetail(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
-            getActivity().onBackPressed(); // Invalid movie
             return;
         }
 
@@ -332,7 +370,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         mMovieOverviewTextView.setText(data.getString(COL_MOVIE_OVERVIEW));
         mMovieReleaseDateTextView.setText(Utility.getFormattedReleaseDate(data.getString(COL_MOVIE_RELEASE_DATE)));
         mMovieVoteAverageTextView.setText(Utility.getFormattedVoteAverage(getActivity(), data.getDouble(COL_MOVIE_VOTE_AVERAGE)));
-
         // Load movie extra data
         getLoaderManager().initLoader(MOVIE_EXTRA_LOADER, null, this);
 
@@ -415,6 +452,29 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         bindImageToView(video.getYouTubeThumbnailUrl(), thumbnailImageView);
 
         container.addView(trailerView);
+    }
+
+    private void toggleMovieDetail(boolean display) {
+
+        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) mFavoriteFab.getLayoutParams();
+
+        if (display) {
+            mEmptyDetailLayout.setVisibility(View.GONE);
+            mHeaderBarView.setVisibility(View.VISIBLE);
+            mBodyView.setVisibility(View.VISIBLE);
+
+            p.setAnchorId(R.id.header_bar);
+            mFavoriteFab.setLayoutParams(p);
+            mFavoriteFab.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyDetailLayout.setVisibility(View.VISIBLE);
+            mHeaderBarView.setVisibility(View.GONE);
+            mBodyView.setVisibility(View.GONE);
+
+            p.setAnchorId(View.NO_ID);
+            mFavoriteFab.setLayoutParams(p);
+            mFavoriteFab.setVisibility(View.GONE);
+        }
     }
 
     /**

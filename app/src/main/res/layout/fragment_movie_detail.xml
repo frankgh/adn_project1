@@ -13,6 +13,8 @@
         android:id="@+id/movie_detail_body"
         layout="@layout/body_movie_detail" />
 
+    <include layout="@layout/movie_detail_empty" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/favorite_fab"
         android:layout_width="wrap_content"
@@ -21,6 +23,7 @@
         android:clickable="true"
         android:contentDescription="@string/movie_detail_add_favorite"
         android:src="@drawable/ic_favorite_outline_24dp"
+        android:visibility="gone"
         app:elevation="@dimen/fab_elevation"
         app:layout_anchor="@id/header_bar"
         app:layout_anchorGravity="bottom|right|end" />

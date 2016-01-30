@@ -27,4 +27,6 @@
     <string name="content_authority">com.frankgh.popularmovies.app</string>
     <string name="no_reviews">No Reviews Available</string>
     <string name="no_trailers">No Trailers Available</string>
+    <string name="empty_movie_detail_label">Sorry, there are no movies matching your criteria</string>
+    <string name="empty_fav_movie_detail_label">You do not have any favorite movies</string>
 </resources>

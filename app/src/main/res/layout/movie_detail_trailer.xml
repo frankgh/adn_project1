@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/movie_detail_trailer_thumbnail_width"
     android:layout_height="@dimen/movie_detail_trailer_thumbnail_height"
+    android:layout_marginRight="@dimen/cardview_regular_margin"
     android:orientation="vertical">
 
     <ImageView

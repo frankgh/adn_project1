@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.frankgh.popularmovies.R;
 import com.frankgh.popularmovies.data.MoviesContract;
@@ -68,10 +70,16 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Bind(R.id.gridview_movies)
     GridView mGridView;
+
     @Bind(R.id.pull_to_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
+
     @BindString(R.string.action_favorites)
     String SORT_BY_FAVORITES;
+
+    @Bind(R.id.empty_movies_layout)
+    LinearLayout mEmptyMoviesLayout;
+
     private int mPosition = GridView.INVALID_POSITION;
     private MovieAdapter mMovieAdapter;
     private boolean mRequiresLoaderRestart;
@@ -242,6 +250,24 @@ public class MovieListFragment extends Fragment implements SwipeRefreshLayout.On
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mSwipeRefreshLayout.setRefreshing(false);
         mMovieAdapter.swapCursor(data);
+
+        TextView emptyMoviesLabel = ButterKnife.findById(mEmptyMoviesLayout, R.id.empty_movies_label);
+
+        if (data.getCount() == 0) {
+            mEmptyMoviesLayout.setVisibility(View.VISIBLE);
+            mSwipeRefreshLayout.setVisibility(View.GONE);
+        } else {
+            mEmptyMoviesLayout.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setVisibility(View.VISIBLE);
+        }
+
+        String preference = Utility.getSortingPreference(getActivity());
+
+        if (SORT_BY_FAVORITES.equals(preference)) {
+            emptyMoviesLabel.setText(R.string.empty_fav_movie_detail_label);
+        } else {
+            emptyMoviesLabel.setText(R.string.empty_movie_detail_label);
+        }
 
         if (mPosition != GridView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a
